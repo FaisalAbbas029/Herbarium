@@ -2,11 +2,11 @@
 // backend (see server.js). Every page and component should call these
 // functions instead of using fetch() directly, so the auth token and
 // error handling stay consistent everywhere.
-const rawApiBase = (import.meta.env.VITE_API_BASE || "").replace(/\/+$/, "");
-const API_BASE = rawApiBase
-  ? rawApiBase.endsWith("/api")
-    ? rawApiBase
-    : `${rawApiBase}/api`
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const API_BASE = API_BASE_URL
+  ? API_BASE_URL.endsWith("/api")
+    ? API_BASE_URL
+    : `${API_BASE_URL}/api`
   : "/api";
 
 // After a successful login the backend gives us a session token (see
@@ -17,24 +17,67 @@ function getAuthHeader() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+async function parseJsonResponse(response, url) {
+  const contentType = response.headers.get("content-type") || "";
+  const text = await response.text();
+  const preview = text && text.length > 300 ? `${text.slice(0, 300)}...` : text;
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    const data = JSON.parse(text);
+    return data;
+  } catch (error) {
+    console.error("API response was not valid JSON", {
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      contentType,
+      bodyPreview: preview
+    });
+    throw new Error(`Server returned a non-JSON response for ${url}. Check the backend URL and response format.`);
+  }
+}
+
 // Shared helper used by almost every function in this file.
 // It automatically adds the auth token, sends/receives JSON, and turns
 // any error response from the server into a JavaScript Error so pages can
 // catch it with a normal try/catch and show a friendly message.
 async function request(url, options = {}) {
+  const fullUrl = `${API_BASE}${url}`;
   const headers = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
     ...options.headers
   };
-  const response = await fetch(`${API_BASE}${url}`, {
+
+  const response = await fetch(fullUrl, {
     ...options,
     headers
   });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "An unexpected error occurred.");
+
+  let data;
+  try {
+    data = await parseJsonResponse(response, fullUrl);
+  } catch (error) {
+    if (!response.ok) {
+      throw error;
+    }
+    throw error;
   }
+
+  if (!response.ok) {
+    console.error("API request failed", {
+      url: fullUrl,
+      status: response.status,
+      statusText: response.statusText,
+      responseBody: data
+    });
+    throw new Error(data?.error || `Request failed with ${response.status} ${response.statusText}.`);
+  }
+
   return data;
 }
 const api = {
@@ -177,9 +220,22 @@ const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: formData
     });
-    const data = await response.json();
+
+    let data;
+    try {
+      data = await parseJsonResponse(response, `${API_BASE}/photos/upload`);
+    } catch (error) {
+      throw error;
+    }
+
     if (!response.ok) {
-      throw new Error(data.error || "Failed to upload photo.");
+      console.error("Photo upload failed", {
+        url: `${API_BASE}/photos/upload`,
+        status: response.status,
+        statusText: response.statusText,
+        responseBody: data
+      });
+      throw new Error(data?.error || "Failed to upload photo.");
     }
     return data;
   },

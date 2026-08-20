@@ -5,6 +5,7 @@ import multer from "multer";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import cors from "cors";
 import { db } from "./server/db.js";
 import {
   authManager,
@@ -20,7 +21,25 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
 const isProd = process.env.NODE_ENV === "production";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://herbariumgb.netlify.app"
+];
 app.set("trust proxy", true);
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error("Origin not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
+}));
 
 // Parse incoming JSON and form bodies. 20mb limit so a specimen record
 // with several base64-encoded fields still fits comfortably.
@@ -89,6 +108,10 @@ const upload = multer({
 // Routes that actually require a logged-in admin use requireAuthMiddleware
 // or requireSuperAdminMiddleware instead (see server/auth.js).
 app.use("/api", optionalAuthMiddleware);
+
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
 
 // ==========================================
 // 1. AUTH & TEAM ENDPOINTS
