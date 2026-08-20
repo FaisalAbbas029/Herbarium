@@ -58,7 +58,7 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 // etc.) — you only need to change the `storage` and `upload` config below;
 // nothing in the React frontend needs to change, because it only ever
 // deals with the final storageUrl string.
-const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
+const UPLOADS_DIR = process.env.UPLOADS_DIR ? path.resolve(process.env.UPLOADS_DIR) : path.resolve(process.cwd(), "uploads");
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }

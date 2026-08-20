@@ -19,8 +19,8 @@ import bcrypt from "bcryptjs";
 // (findUserByEmail, createSpecimen, createInvitation, and so on) would
 // stay the same, so server.js and the rest of the app would not need to
 // change at all.
-const DATA_DIR = path.resolve(process.cwd(), "data");
-const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
+const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.resolve(process.cwd(), "data");
+const UPLOADS_DIR = process.env.UPLOADS_DIR ? path.resolve(process.env.UPLOADS_DIR) : path.resolve(process.cwd(), "uploads");
 const DB_FILE = path.join(DATA_DIR, "herbarium.json");
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
