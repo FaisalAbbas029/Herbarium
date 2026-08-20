@@ -2,7 +2,12 @@
 // backend (see server.js). Every page and component should call these
 // functions instead of using fetch() directly, so the auth token and
 // error handling stay consistent everywhere.
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").trim().replace(/\/+$/, "");
+
+if (import.meta.env.PROD && !API_BASE_URL) {
+  throw new Error("VITE_API_URL is required in production. Set it to your deployed Express backend URL before deploying the frontend.");
+}
+
 const API_BASE = API_BASE_URL
   ? API_BASE_URL.endsWith("/api")
     ? API_BASE_URL
