@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sylva-herbarium
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/public/stats
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+      - key: UPLOADS_DIR
+        value: /var/data/uploads
+    disk:
+      name: sylva-herbarium-data
+      mountPath: /var/data
+      sizeGB: 1

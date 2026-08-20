@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-herb-bg: #FAF8F5;
+    --color-herb-surface: #FFFFFF;
+    --color-herb-surface-subtle: #F3EFEA;
+    --color-herb-surface-muted: #EAE5DE;
+    --color-herb-border: #E0D9CE;
+    --color-herb-border-subtle: #EDE7DD;
+    --color-herb-primary: #1F4529;
+    --color-herb-primary-hover: #15321D;
+    --color-herb-accent: #47663B;
+    --color-herb-ochre: #C07F00;
+    --color-herb-amber: #A45D25;
+    --color-herb-text: #1C241E;
+    --color-herb-text-muted: #566158;
+    --color-herb-text-light: #7E8C81;
+  }
+
+  body {
+    background-color: var(--color-herb-bg);
+    color: var(--color-herb-text);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1, h2, h3, .font-serif-heading {
+    font-family: 'Lora', Georgia, Cambria, serif;
+  }
+
+  .font-display {
+    font-family: 'Cinzel', serif;
+  }
+
+  .font-mono-acc {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom scrollbars for botanical aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F3EFEA;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C7BEB1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A89F91;
+}
+
+/* Specimen Sheet Texture simulation */
+.specimen-paper {
+  background-color: #FFFFFF;
+  background-image: radial-gradient(#F0EAE1 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+/* Printing styles for Specimen Label / Herbarium Sheet view */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}

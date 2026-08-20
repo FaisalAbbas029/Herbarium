@@ -1,0 +1,10 @@
+Superadmin:
+
+Name: Faisal Abbas
+Email: faisalabbas@gmail.com
+Password: Faisal@123
+Admin:
+
+Name: Shoaib
+Email: shoaib@gmail.com
+Password: Shoaib@123
