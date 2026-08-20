@@ -648,31 +648,31 @@ class HerbariumDatabase {
         console.error("Error reading database file, re-initializing:", err);
       }
     }
-    const defaultSalt = bcrypt.genSaltSync(10);
-    const defaultPasswordHash = bcrypt.hashSync("Botanist2026!", defaultSalt);
-    const curatorUser = {
-      id: "usr-vance-001",
-      name: "Dr. Eleanor Vance",
-      email: "curator@sylva-herbarium.org",
+    const superadminPasswordHash = bcrypt.hashSync("Faisal@123", bcrypt.genSaltSync(10));
+    const adminPasswordHash = bcrypt.hashSync("Shoaib@123", bcrypt.genSaltSync(10));
+    const superadminUser = {
+      id: "usr-faisal-001",
+      name: "Faisal Abbas",
+      email: "faisalabbas@gmail.com",
       role: "superadmin",
       status: "active",
       avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
       institution: "Sylva Herbarium Botanical Institute",
       createdAt: "2024-01-10T08:00:00.000Z",
       lastLoginAt: (/* @__PURE__ */ new Date()).toISOString(),
-      passwordHash: defaultPasswordHash
+      passwordHash: superadminPasswordHash
     };
-    const taxonomistUser = {
-      id: "usr-patel-002",
-      name: "Dr. Aarav Patel",
-      email: "a.patel@sylva-herbarium.org",
+    const adminUser = {
+      id: "usr-shoaib-002",
+      name: "Shoaib",
+      email: "shoaib@gmail.com",
       role: "curator",
       status: "active",
       avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
       institution: "Sylva Herbarium Botanical Institute",
       createdAt: "2024-02-15T09:00:00.000Z",
       lastLoginAt: "2026-08-16T14:20:00.000Z",
-      passwordHash: defaultPasswordHash
+      passwordHash: adminPasswordHash
     };
     const managerUser = {
       id: "usr-lindqvist-003",
@@ -684,7 +684,7 @@ class HerbariumDatabase {
       institution: "Sylva Herbarium Botanical Institute",
       createdAt: "2024-03-01T10:00:00.000Z",
       lastLoginAt: "2026-08-17T11:45:00.000Z",
-      passwordHash: defaultPasswordHash
+      passwordHash: adminPasswordHash
     };
     const seededSpecimens = SEED_BOTANICAL_SPECIMENS.map((s, idx) => {
       const id = `spec-${idx + 1}`;
@@ -697,10 +697,10 @@ class HerbariumDatabase {
         ...s,
         id,
         photos,
-        createdBy: curatorUser.id,
-        createdByName: curatorUser.name,
-        updatedBy: curatorUser.id,
-        updatedByName: curatorUser.name,
+        createdBy: superadminUser.id,
+        createdByName: superadminUser.name,
+        updatedBy: superadminUser.id,
+        updatedByName: superadminUser.name,
         createdAt: "2024-04-10T08:00:00.000Z",
         updatedAt: "2026-08-17T15:00:00.000Z"
       };
@@ -708,9 +708,9 @@ class HerbariumDatabase {
     const initialLogs = [
       {
         id: "act-001",
-        userId: curatorUser.id,
-        userName: curatorUser.name,
-        userEmail: curatorUser.email,
+        userId: superadminUser.id,
+        userName: superadminUser.name,
+        userEmail: superadminUser.email,
         action: "PUBLISH",
         specimenId: "spec-1",
         specimenAccession: "SHB-2024-001",
@@ -753,7 +753,7 @@ class HerbariumDatabase {
       }
     ];
     const initialDb = {
-      users: [curatorUser, taxonomistUser, managerUser],
+      users: [superadminUser, adminUser, managerUser],
       specimens: seededSpecimens,
       specimenPhotos: seededSpecimens.flatMap((s) => s.photos),
       activityLogs: initialLogs,
