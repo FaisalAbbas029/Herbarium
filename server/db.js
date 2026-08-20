@@ -723,9 +723,9 @@ class HerbariumDatabase {
       },
       {
         id: "act-002",
-        userId: taxonomistUser.id,
-        userName: taxonomistUser.name,
-        userEmail: taxonomistUser.email,
+        userId: adminUser.id,
+        userName: adminUser.name,
+        userEmail: adminUser.email,
         action: "PHOTO_ADD",
         specimenId: "spec-10",
         specimenAccession: "SHB-2024-010",
