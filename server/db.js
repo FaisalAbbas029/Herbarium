@@ -66,7 +66,7 @@ const SEED_BOTANICAL_SPECIMENS = [
       {
         id: "photo-ginkgo-1",
         specimenId: "spec-1",
-        storageUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
+        storageUrl: "https://pixabay.com/images/download/lancier-gingko-5789687_1920.jpg",
         altText: "Pressed herbarium specimen showing dichotomously veined Ginkgo biloba leaves on short shoot",
         caption: "Herbarium voucher sheet: Short shoots with typical fan-shaped bilobed lamina",
         displayOrder: 0,
@@ -130,32 +130,7 @@ const SEED_BOTANICAL_SPECIMENS = [
     otherNotes: "Warning: Highly toxic when ingested. Voucher sheet stored in high-security botanical cabinet.",
     status: "PUBLISHED",
     publishedAt: "2024-06-01T14:30:00.000Z",
-    photos: [
-      {
-        id: "photo-digitalis-1",
-        specimenId: "spec-2",
-        storageUrl: "https://images.unsplash.com/photo-1596726618451-b84784400e93?auto=format&fit=crop&w=1200&q=80",
-        altText: "Close up of Digitalis purpurea flowering raceme showing spotted throat patterns",
-        caption: "Inflorescence: Terminal raceme with zygomorphic maculate corollas",
-        displayOrder: 0,
-        isPrimary: true,
-        uploadTimestamp: "2024-05-30T11:00:00.000Z",
-        fileSizeBytes: 48e4,
-        dimensions: "1600x1200"
-      },
-      {
-        id: "photo-digitalis-2",
-        specimenId: "spec-2",
-        storageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=1200&q=80",
-        altText: "Wild Digitalis purpurea growing on mossy alpine forest floor",
-        caption: "Natural habitat view: Forest clearing with acidic humus substrate",
-        displayOrder: 1,
-        isPrimary: false,
-        uploadTimestamp: "2024-05-30T11:05:00.000Z",
-        fileSizeBytes: 59e4,
-        dimensions: "1920x1280"
-      }
-    ]
+    photos: []
   },
   {
     accessionNumber: "SHB-2024-003",
@@ -574,20 +549,7 @@ const SEED_BOTANICAL_SPECIMENS = [
     otherNotes: "Mounted with acid-free archival linen strapping to protect fragile stipes.",
     status: "PUBLISHED",
     publishedAt: "2024-08-17T14:30:00.000Z",
-    photos: [
-      {
-        id: "photo-adiantum-1",
-        specimenId: "spec-11",
-        storageUrl: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=80",
-        altText: "Adiantum capillus-veneris delicate fan shaped pinnules and black stipes",
-        caption: "Frond architecture: Ebony stipes supporting fan-shaped flabellate pinnules",
-        displayOrder: 0,
-        isPrimary: true,
-        uploadTimestamp: "2024-08-17T09:00:00.000Z",
-        fileSizeBytes: 41e4,
-        dimensions: "1600x1200"
-      }
-    ]
+    photos: []
   },
   {
     accessionNumber: "SHB-2024-012",
@@ -622,7 +584,7 @@ const SEED_BOTANICAL_SPECIMENS = [
       {
         id: "photo-atropa-1",
         specimenId: "spec-12",
-        storageUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
+        storageUrl: "https://pixabay.com/images/download/lancier-gingko-5789687_1920.jpg",
         altText: "Atropa belladonna flowering branch with purple campanulate flowers and green calyx",
         caption: "Inflorescence: Campanulate brownish-purple flowers on axillary pedicels",
         displayOrder: 0,

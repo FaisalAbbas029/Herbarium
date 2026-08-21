@@ -86,21 +86,58 @@ const storage = multer.diskStorage({
 // File-type and size validation happens here on the server (never trust
 // only the browser). Only real image formats are accepted, and files over
 // 15MB are rejected before they ever touch disk.
+const allowedImageMimeTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/bmp",
+  "image/tiff",
+  "image/tif",
+  "image/svg+xml"
+]);
+const allowedImageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff", ".svg"]);
+const imageMimeByExtension = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".bmp": "image/bmp",
+  ".tif": "image/tiff",
+  ".tiff": "image/tiff",
+  ".svg": "image/svg+xml"
+};
+
 const upload = multer({
   storage,
   limits: { fileSize: 15 * 1024 * 1024 },
   // 15MB limit
   fileFilter: (_req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|tiff|tif|gif/i;
     const ext = path.extname(file.originalname).toLowerCase();
-    const mime = file.mimetype;
-    if (allowed.test(ext) && (mime.startsWith("image/") || allowed.test(mime))) {
+    const mime = file.mimetype.toLowerCase();
+    if (allowedImageExtensions.has(ext) && (!mime || mime === "application/octet-stream" || allowedImageMimeTypes.has(mime))) {
       cb(null, true);
     } else {
-      cb(new Error("Only valid image files (JPG, PNG, WebP, TIFF) are supported."));
+      cb(new Error("Supported image formats are JPG, PNG, WebP, GIF, BMP, TIFF, and safe SVG files."));
     }
   }
 });
+
+const hasImageSignature = (buffer, mimetype) => {
+  if (!buffer || buffer.length < 4) return false;
+  if (mimetype === "image/jpeg") return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  if (mimetype === "image/png") return buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  if (mimetype === "image/gif") return ["GIF87a", "GIF89a"].includes(buffer.subarray(0, 6).toString("ascii"));
+  if (mimetype === "image/bmp") return buffer.subarray(0, 2).toString("ascii") === "BM";
+  if (mimetype === "image/webp") return buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP";
+  if (mimetype === "image/tiff" || mimetype === "image/tif") return (buffer[0] === 0x49 && buffer[1] === 0x49 && buffer[2] === 0x2a && buffer[3] === 0x00) || (buffer[0] === 0x4d && buffer[1] === 0x4d && buffer[2] === 0x00 && buffer[3] === 0x2a);
+  if (mimetype === "image/svg+xml") {
+    const markup = buffer.toString("utf8", 0, Math.min(buffer.length, 5120));
+    return /<svg(?:\s|>)/i.test(markup) && !/<script|on[a-z]+\s*=|javascript:|<foreignObject/i.test(markup);
+  }
+  return false;
+};
 
 // Every request under /api first passes through "optional" auth: if a
 // valid Bearer token is present we attach req.user, but requests without
@@ -292,6 +329,19 @@ app.post("/api/photos/upload", requireAuthMiddleware, (req, res) => {
     }
     if (!req.file) {
       return res.status(400).json({ error: "No image file provided." });
+    }
+    try {
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const extension = path.extname(req.file.originalname).toLowerCase();
+      const uploadedMimeType = req.file.mimetype.toLowerCase();
+      const detectedMimeType = allowedImageMimeTypes.has(uploadedMimeType) ? uploadedMimeType : imageMimeByExtension[extension];
+      if (!hasImageSignature(fileBuffer, detectedMimeType)) {
+        fs.unlinkSync(req.file.path);
+        return res.status(400).json({ error: "The selected file is not a valid supported image." });
+      }
+    } catch (validationError) {
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: "Unable to validate the uploaded image." });
     }
     const storageUrl = `/uploads/${req.file.filename}`;
     return res.json({
