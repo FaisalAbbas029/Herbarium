@@ -150,7 +150,7 @@ const ContactPage = ({ onNavigate }) => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-[#1C241E] block">Sylva Herbarium (SHB)</strong>
+                  <strong className="text-[#1C241E] block">Gilgit-Baltistan Herbarium Archive (SHB)</strong>
                   <span>Wing C, Institute of Botanical Sciences</span>
                   <br />
                   <span>Reserve Botanical Station, Europe</span>
@@ -159,7 +159,7 @@ const ContactPage = ({ onNavigate }) => {
 
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-[#47663B] shrink-0" />
-                <span>curation@sylva-herbarium.org</span>
+                <span>curation@gb-herbarium.org</span>
               </div>
 
               <div className="flex items-center gap-3">

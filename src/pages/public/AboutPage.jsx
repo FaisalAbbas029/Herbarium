@@ -9,10 +9,10 @@ const AboutPage = ({ onNavigate }) => {
           Institutional Heritage
         </div>
         <h1 className="font-serif-heading text-3xl sm:text-5xl font-bold text-[#1C241E] leading-tight">
-          About the Sylva Herbarium Digital Botanical Archive
+          About the Gilgit-Baltistan Herbarium Archive
         </h1>
         <p className="text-base sm:text-lg text-[#566158] leading-relaxed">
-          Founded as a center of systematic botany and phytogeography, the Sylva Herbarium houses comprehensive physical and digitized vouchers representing temperate, alpine, and Mediterranean floras.
+          Founded as a center of systematic botany and phytogeography, the Gilgit-Baltistan Herbarium Archive houses comprehensive physical and digitized vouchers representing temperate, alpine, and Mediterranean floras.
         </p>
       </div>
 
@@ -28,7 +28,7 @@ const AboutPage = ({ onNavigate }) => {
             Our Scientific Mission
           </h2>
           <p className="text-sm text-[#566158] leading-relaxed">
-            The mission of the Sylva Herbarium is to discover, document, preserve, and interpret plant biodiversity for research, conservation biology, education, and pharmaceutical science. Our open digital repository provides researchers globally with open access to high-fidelity anatomical imagery and verified collection metadata.
+            The mission of the Gilgit-Baltistan Herbarium Archive is to discover, document, preserve, and interpret plant biodiversity for research, conservation biology, education, and pharmaceutical science. Our open digital repository provides researchers globally with open access to high-fidelity anatomical imagery and verified collection metadata.
           </p>
         </div>
 

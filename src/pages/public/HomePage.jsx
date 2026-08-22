@@ -268,7 +268,7 @@ const HomePage = ({ onNavigate }) => {
               Methodology of Archival Preservation
             </h2>
             <p className="text-sm text-[#566158] mt-2 leading-relaxed">
-              Every specimen in the Sylva Herbarium follows rigorous physical and digital curation protocols to support worldwide botanical, ecological, and pharmacological research.
+              Every specimen in the Gilgit-Baltistan Herbarium Archive follows rigorous physical and digital curation protocols to support worldwide botanical, ecological, and pharmacological research.
             </p>
           </div>
 
@@ -353,7 +353,7 @@ const HomePage = ({ onNavigate }) => {
               Conducting Botanical or Pharmacognosy Research?
             </h2>
             <p className="text-sm text-[#D8E6DC] leading-relaxed">
-              The Sylva Herbarium facilitates digital loan requests, high-resolution TIFF image exports, and DNA-grade tissue sampling permissions for accredited institutions.
+              The Gilgit-Baltistan Herbarium Archive facilitates digital loan requests, high-resolution TIFF image exports, and DNA-grade tissue sampling permissions for accredited institutions.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">

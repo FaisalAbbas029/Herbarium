@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sylva-herbarium
+    name: gb-herbarium
     runtime: node
     plan: free
     buildCommand: npm install && npm run build
@@ -14,6 +14,6 @@ services:
       - key: UPLOADS_DIR
         value: /var/data/uploads
     disk:
-      name: sylva-herbarium-data
+      name: gb-herbarium-data
       mountPath: /var/data
       sizeGB: 1

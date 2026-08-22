@@ -58,6 +58,13 @@ class AuthManager {
   deleteSession(token) {
     this.sessions.delete(token);
   }
+  revokeUserSessions(userId) {
+    for (const [token, session] of this.sessions.entries()) {
+      if (session.userId === userId) {
+        this.sessions.delete(token);
+      }
+    }
+  }
   getUserFromToken(token) {
     const session = this.getSession(token);
     if (!session) return null;

@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
   // whether it's still valid (GET /api/auth/me) and load that user's
   // details; if the token is missing, expired, or invalid, we clear it.
   const checkAuth = async () => {
-    const token = localStorage.getItem("sylva_herbarium_token");
+    const token = localStorage.getItem("gb_herbarium_token");
     if (!token) {
       setUser(null);
       setIsLoading(false);
@@ -26,7 +26,7 @@ const AuthProvider = ({ children }) => {
       setUser(res.user);
     } catch (err) {
       console.warn("Session check failed or expired:", err);
-      localStorage.removeItem("sylva_herbarium_token");
+      localStorage.removeItem("gb_herbarium_token");
       setUser(null);
     } finally {
       setIsLoading(false);

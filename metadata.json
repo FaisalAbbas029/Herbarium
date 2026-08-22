@@ -1,5 +1,5 @@
 {
-  "name": "SylvaHerbarium Digital Archive",
+  "name": "GB Herbarium — Gilgit-Baltistan Herbarium Archive",
   "description": "A digital botanical herbarium and research archive for cataloging, preserving, and exploring plant specimen collections with advanced taxonomic search and curation.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

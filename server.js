@@ -198,7 +198,7 @@ app.post("/api/auth/logout", requireAuthMiddleware, (req, res) => {
 app.get("/api/team", requireAuthMiddleware, (req, res) => {
   try {
     const users = db.getAllUsers();
-    const invitations = db.getInvitations();
+    const invitations = (db.getInvitations() || []).filter((i) => i.status === "pending");
     return res.json({ users, invitations });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -304,7 +304,91 @@ app.post("/api/team/toggle-status", requireSuperAdminMiddleware, (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+const handleUserDeletion = (userId, req, res) => {
+  try {
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required." });
+    }
+    if (userId === req.user.id) {
+      return res.status(400).json({ error: "You cannot remove your own administrative account." });
+    }
+    const targetUser = db.findUserById(userId);
+    if (!targetUser) {
+      return res.status(404).json({ error: "Staff member not found or already removed." });
+    }
+    const deleted = db.deleteUser(userId);
+    if (!deleted) {
+      return res.status(404).json({ error: "Staff member could not be deleted." });
+    }
+    // Revoke any active login sessions immediately
+    authManager.revokeUserSessions(userId);
+
+    try {
+      db.logActivity({
+        userId: req.user.id,
+        userName: req.user.name,
+        userEmail: req.user.email,
+        action: "DELETE",
+        specimenId: null,
+        specimenAccession: null,
+        specimenScientificName: null,
+        fieldChanged: "staff_member",
+        previousValue: targetUser.email,
+        newValue: null,
+        notes: `Permanently removed staff member ${targetUser.name} (${targetUser.email})`
+      });
+    } catch (logErr) {
+      console.warn("Could not log activity for user deletion:", logErr);
+    }
+
+    return res.json({ success: true, message: `Staff member ${targetUser.name} permanently removed.` });
+  } catch (error) {
+    console.error("User deletion error:", error);
+    return res.status(500).json({ error: error.message || "Failed to remove staff member." });
+  }
+};
+
+app.delete("/api/team/users/:id", requireSuperAdminMiddleware, (req, res) => {
+  return handleUserDeletion(req.params.id, req, res);
+});
+app.post("/api/team/users/:id/delete", requireSuperAdminMiddleware, (req, res) => {
+  return handleUserDeletion(req.params.id, req, res);
+});
+app.post("/api/team/remove-user", requireSuperAdminMiddleware, (req, res) => {
+  return handleUserDeletion(req.body.userId, req, res);
+});
 app.delete("/api/team/invitations/:id", requireSuperAdminMiddleware, (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = db.deleteInvitation(id);
+    if (!deleted) {
+      // Fallback if not found or already removed
+      db.revokeInvitation(id);
+    }
+    return res.json({ success: true, message: "Invitation cancelled and removed." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+app.post("/api/team/invitations/:id/cancel", requireSuperAdminMiddleware, (req, res) => {
+  try {
+    const { id } = req.params;
+    db.deleteInvitation(id);
+    return res.json({ success: true, message: "Invitation cancelled and removed." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+app.post("/api/team/invitations/:id/revoke", requireSuperAdminMiddleware, (req, res) => {
+  try {
+    const { id } = req.params;
+    db.revokeInvitation(id);
+    return res.json({ success: true, message: "Invitation revoked." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+app.delete("/api/team/invitations/:id/revoke", requireSuperAdminMiddleware, (req, res) => {
   try {
     const { id } = req.params;
     db.revokeInvitation(id);
@@ -708,9 +792,9 @@ async function startServer() {
   }
   app.listen(PORT, HOST, () => {
     console.log(`
-  \u{1F33F} Sylva Herbarium Digital Archive & Research Platform`);
-    console.log(`  \u279C  Local:   http://localhost:${PORT}/`);
-    console.log(`  \u279C  Network: http://${HOST}:${PORT}/
+  \u{1F33F} GB Herbarium — Gilgit-Baltistan Herbarium Archive & Research Platform`);
+    console.log(`  ➜  Local:   http://localhost:${PORT}/`);
+    console.log(`  ➜  Network: http://${HOST}:${PORT}/
 `);
   });
 }

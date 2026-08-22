@@ -30,10 +30,10 @@ const AdminLoginPage = ({ onNavigate }) => {
             <Leaf className="w-6 h-6 text-[#E3D8C8]" />
           </div>
           <h1 className="font-serif-heading text-2xl sm:text-3xl font-bold text-[#1C241E]">
-            Curator Authentication
+            Admin Authentication
           </h1>
           <p className="text-xs text-[#566158]">
-            Restricted access for Sylva Herbarium botanical staff and curators.
+            Restricted access for Gilgit-Baltistan Herbarium Archive staff and curators.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ const AdminLoginPage = ({ onNavigate }) => {
     required
     value={email}
     onChange={(e) => setEmail(e.target.value)}
-    placeholder="curator@sylva-herbarium.org"
+    placeholder="admin@gb-herbarium.org"
     className="w-full pl-9 pr-3.5 py-2.5 text-xs sm:text-sm bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:outline-hidden focus:ring-1 focus:ring-[#1F4529] text-[#1C241E]"
   />
               </div>

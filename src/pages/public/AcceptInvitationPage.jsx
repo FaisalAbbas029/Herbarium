@@ -69,7 +69,7 @@ const AcceptInvitationPage = ({
             Accept Curator Invitation
           </h1>
           <p className="text-xs text-[#566158]">
-            Set up your credentials to join the Sylva Herbarium archival team.
+            Set up your credentials to join the Gilgit-Baltistan Herbarium Archive team.
           </p>
         </div>
 

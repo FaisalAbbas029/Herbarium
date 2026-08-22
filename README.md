@@ -1,4 +1,4 @@
-# Sylva Herbarium — Digital Botanical Archive & Research Platform
+# GB Herbarium — Gilgit-Baltistan Herbarium Archive & Research Platform
 
 A digital herbarium and specimen cataloging system with a public archive
 (search, browse, specimen detail pages) and a full admin panel (specimen
@@ -12,7 +12,7 @@ No TypeScript anywhere in this project.**
 ## Project Structure
 
 ```
-sylva-js/
+gb-herbarium/
 ├── src/
 │   ├── components/common/     Navbar, Footer, SpecimenCard, PhotoGalleryModal,
 │   │                          ConfirmModal, ConservationBadge
@@ -140,7 +140,7 @@ Then open **http://localhost:3000**
 
 Demo admin login (seeded automatically on first run):
 ```
-Email:    curator@sylva-herbarium.org
+Email:    curator@gb-herbarium.org
 Password: Botanist2026!
 ```
 

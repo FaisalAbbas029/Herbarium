@@ -12,7 +12,7 @@ const Footer = ({ onNavigate }) => {
                 <Leaf className="w-4 h-4 text-[#D8E6DC]" />
               </div>
               <span className="font-display tracking-widest text-lg font-bold text-[#FAF8F5]">
-                SYLVA HERBARIUM
+                GB Herbarium
               </span>
             </div>
             <p className="text-xs leading-relaxed text-[#A4B3A8]">
@@ -124,7 +124,7 @@ const Footer = ({ onNavigate }) => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#5A9E72] shrink-0" />
-                <span>curation@sylva-herbarium.org</span>
+                <span>curation@gb-herbarium.org</span>
               </div>
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-[#5A9E72] shrink-0" />
@@ -136,7 +136,7 @@ const Footer = ({ onNavigate }) => {
 
         <div className="mt-12 pt-6 border-t border-[#2D3F33] flex flex-col sm:flex-row items-center justify-between text-xs text-[#7A8B7F] gap-4">
           <div>
-            © {(/* @__PURE__ */ new Date()).getFullYear()} Sylva Herbarium Digital Botanical Archive. All voucher records published under Creative Commons Attribution-NonCommercial (CC BY-NC 4.0).
+            © {(/* @__PURE__ */ new Date()).getFullYear()} Gilgit-Baltistan Herbarium Archive. All voucher records published under Creative Commons Attribution-NonCommercial (CC BY-NC 4.0).
           </div>
           <div className="flex items-center gap-4">
             <button onClick={() => onNavigate("/about")} className="hover:text-white transition-colors">

@@ -619,7 +619,7 @@ class HerbariumDatabase {
       role: "superadmin",
       status: "active",
       avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
-      institution: "Sylva Herbarium Botanical Institute",
+      institution: "Gilgit-Baltistan Herbarium Archive",
       createdAt: "2024-01-10T08:00:00.000Z",
       lastLoginAt: (/* @__PURE__ */ new Date()).toISOString(),
       passwordHash: superadminPasswordHash
@@ -631,7 +631,7 @@ class HerbariumDatabase {
       role: "curator",
       status: "active",
       avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
-      institution: "Sylva Herbarium Botanical Institute",
+      institution: "Gilgit-Baltistan Herbarium Archive",
       createdAt: "2024-02-15T09:00:00.000Z",
       lastLoginAt: "2026-08-16T14:20:00.000Z",
       passwordHash: adminPasswordHash
@@ -639,11 +639,11 @@ class HerbariumDatabase {
     const managerUser = {
       id: "usr-lindqvist-003",
       name: "Sarah Lindqvist",
-      email: "s.lindqvist@sylva-herbarium.org",
+      email: "s.lindqvist@gb-herbarium.org",
       role: "curator",
       status: "active",
       avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80",
-      institution: "Sylva Herbarium Botanical Institute",
+      institution: "Gilgit-Baltistan Herbarium Archive",
       createdAt: "2024-03-01T10:00:00.000Z",
       lastLoginAt: "2026-08-17T11:45:00.000Z",
       passwordHash: adminPasswordHash
@@ -726,7 +726,7 @@ class HerbariumDatabase {
           name: "Prof. Julian Thorne",
           email: "j.thorne@cambridge-botany.ac.uk",
           subject: "Collaborative DNA barcoding inquiry on Ginkgoales vouchers",
-          message: "Dear Sylva Herbarium curation team, our department is conducting comparative plastid genome sequencing on East Asian Ginkgo specimens. We would like to request high-resolution micrographs of specimen SHB-2024-001.",
+          message: "Dear Gilgit-Baltistan Herbarium Archive curation team, our department is conducting comparative plastid genome sequencing on East Asian Ginkgo specimens. We would like to request high-resolution micrographs of specimen SHB-2024-001.",
           createdAt: "2026-08-15T09:30:00.000Z",
           status: "unread"
         }
@@ -767,7 +767,7 @@ class HerbariumDatabase {
       email: userData.email.toLowerCase().trim(),
       role: userData.role,
       status: "active",
-      institution: userData.institution || "Sylva Herbarium Botanical Institute",
+      institution: userData.institution || "Gilgit-Baltistan Herbarium Archive",
       createdAt: (/* @__PURE__ */ new Date()).toISOString(),
       passwordHash
     };
@@ -783,6 +783,18 @@ class HerbariumDatabase {
     this.persist();
     const { passwordHash, ...safeUser } = user;
     return safeUser;
+  }
+  deleteUser(userId) {
+    const user = this.data.users.find((u) => u.id === userId);
+    if (!user) return null;
+    const initialLength = this.data.users.length;
+    this.data.users = this.data.users.filter((u) => u.id !== userId);
+    if (this.data.users.length !== initialLength) {
+      this.persist();
+      const { passwordHash, ...safeUser } = user;
+      return safeUser;
+    }
+    return null;
   }
   recordUserLogin(userId) {
     const user = this.data.users.find((u) => u.id === userId);
@@ -857,7 +869,20 @@ class HerbariumDatabase {
     if (inv) {
       inv.status = "revoked";
       this.persist();
+      return true;
     }
+    return false;
+  }
+  deleteInvitation(invitationId) {
+    const initialLength = this.data.adminInvitations.length;
+    this.data.adminInvitations = this.data.adminInvitations.filter(
+      (i) => i.id !== invitationId && i.token !== invitationId
+    );
+    if (this.data.adminInvitations.length !== initialLength) {
+      this.persist();
+      return true;
+    }
+    return false;
   }
   // --- Specimens CRUD ---
   searchSpecimens(params, isAdmin = false) {

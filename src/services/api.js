@@ -18,7 +18,7 @@ const API_BASE = API_BASE_URL
 // server/auth.js). We keep that token in localStorage so the admin stays
 // logged in after a page refresh, and attach it to every request below.
 function getAuthHeader() {
-  const token = localStorage.getItem("sylva_herbarium_token");
+  const token = localStorage.getItem("gb_herbarium_token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -58,32 +58,45 @@ async function request(url, options = {}) {
     ...options.headers
   };
 
-  const response = await fetch(fullUrl, {
-    ...options,
-    headers
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-  let data;
   try {
-    data = await parseJsonResponse(response, fullUrl);
-  } catch (error) {
-    if (!response.ok) {
+    const response = await fetch(fullUrl, {
+      ...options,
+      headers,
+      signal: controller.signal
+    });
+
+    let data;
+    try {
+      data = await parseJsonResponse(response, fullUrl);
+    } catch (error) {
+      if (!response.ok) {
+        throw error;
+      }
       throw error;
     }
-    throw error;
-  }
 
-  if (!response.ok) {
-    console.error("API request failed", {
-      url: fullUrl,
-      status: response.status,
-      statusText: response.statusText,
-      responseBody: data
-    });
-    throw new Error(data?.error || `Request failed with ${response.status} ${response.statusText}.`);
-  }
+    if (!response.ok) {
+      console.error("API request failed", {
+        url: fullUrl,
+        status: response.status,
+        statusText: response.statusText,
+        responseBody: data
+      });
+      throw new Error(data?.error || `Request failed with ${response.status} ${response.statusText}.`);
+    }
 
-  return data;
+    return data;
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error("Request timed out. Please check your connection and try again.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 const api = {
   // Auth
@@ -92,7 +105,7 @@ const api = {
       method: "POST",
       body: JSON.stringify(credentials)
     });
-    localStorage.setItem("sylva_herbarium_token", res.token);
+    localStorage.setItem("gb_herbarium_token", res.token);
     return res;
   },
   async getCurrentUser() {
@@ -102,10 +115,10 @@ const api = {
     try {
       await request("/auth/logout", { method: "POST" });
     } finally {
-      localStorage.removeItem("sylva_herbarium_token");
+      localStorage.removeItem("gb_herbarium_token");
     }
   },
-  // Team
+  // Team management (superadmin only)
   async getTeam() {
     return request("/team");
   },
@@ -121,7 +134,17 @@ const api = {
       body: JSON.stringify({ userId, status })
     });
   },
+  async removeStaffMember(userId) {
+    return request(`/team/users/${userId}`, {
+      method: "DELETE"
+    });
+  },
   async revokeInvitation(invitationId) {
+    return request(`/team/invitations/${invitationId}/revoke`, {
+      method: "POST"
+    });
+  },
+  async cancelInvitation(invitationId) {
     return request(`/team/invitations/${invitationId}`, {
       method: "DELETE"
     });
@@ -134,7 +157,7 @@ const api = {
       method: "POST",
       body: JSON.stringify(data)
     });
-    localStorage.setItem("sylva_herbarium_token", res.token);
+    localStorage.setItem("gb_herbarium_token", res.token);
     return res;
   },
   // Specimens
@@ -219,7 +242,7 @@ const api = {
   async uploadPhotoFile(file) {
     const formData = new FormData();
     formData.append("photo", file);
-    const token = localStorage.getItem("sylva_herbarium_token");
+    const token = localStorage.getItem("gb_herbarium_token");
     const response = await fetch(`${API_BASE}/photos/upload`, {
       method: "POST",
       headers: token ? { Authorization: `Bearer ${token}` } : {},

@@ -85,7 +85,7 @@ const SpecimenDetailPage = ({
     month: "short",
     day: "numeric"
   });
-  const citationText = `Sylva Herbarium Botanical Archive (${(/* @__PURE__ */ new Date()).getFullYear()}). Specimen Voucher Record: ${specimen.scientificName} [Accession No. ${specimen.accessionNumber}]. Collected by ${specimen.collectorName || "Institutional Staff"}, ${specimen.collectionLocation || specimen.region}. Sylva Herbarium (SHB).`;
+  const citationText = `Gilgit-Baltistan Herbarium Archive (${(/* @__PURE__ */ new Date()).getFullYear()}). Specimen Voucher Record: ${specimen.scientificName} [Accession No. ${specimen.accessionNumber}]. Collected by ${specimen.collectorName || "Institutional Staff"}, ${specimen.collectionLocation || specimen.region}. GB Herbarium (SHB).`;
   const copyCitation = () => {
     navigator.clipboard.writeText(citationText);
     setCopiedCitation(true);
@@ -268,7 +268,7 @@ const SpecimenDetailPage = ({
               <User className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
               <div>
                 <span className="text-[#6E7570] block uppercase font-semibold text-[10px]">Collector(s)</span>
-                <span className="text-[#1C241E] font-medium">{specimen.collectorName || "Sylva Herbarium Field Team"}</span>
+                <span className="text-[#1C241E] font-medium">{specimen.collectorName || "GB Herbarium Field Team"}</span>
               </div>
             </div>
 

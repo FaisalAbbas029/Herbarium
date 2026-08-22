@@ -43,20 +43,30 @@ const ConfirmModal = ({
 
         <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#EDE7DD] pt-4">
           <button
-    type="button"
-    onClick={onCancel}
-    disabled={isLoading}
-    className="px-4 py-2 text-sm font-medium text-[#4A554D] hover:bg-[#F3EFEA] border border-[#C7BEB1] rounded-sm transition-colors whitespace-nowrap shrink-0"
-  >
+            type="button"
+            onClick={onCancel}
+            disabled={isLoading}
+            className="px-4 py-2 text-sm font-medium text-[#4A554D] hover:bg-[#F3EFEA] border border-[#C7BEB1] rounded-sm transition-colors whitespace-nowrap shrink-0 disabled:opacity-50"
+          >
             {cancelLabel}
           </button>
           <button
-    type="button"
-    onClick={onConfirm}
-    disabled={isLoading}
-    className={`px-4 py-2 text-sm font-medium text-white rounded-sm transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 ${isDestructive ? "bg-[#8F2D14] hover:bg-[#73230F]" : "bg-[#1F4529] hover:bg-[#15321D]"} disabled:opacity-50`}
-  >
-            {isLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!isLoading && onConfirm) {
+                onConfirm();
+              }
+            }}
+            disabled={isLoading}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-sm transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 ${
+              isDestructive ? "bg-[#8F2D14] hover:bg-[#73230F]" : "bg-[#1F4529] hover:bg-[#15321D]"
+            } disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed`}
+          >
+            {isLoading && (
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+            )}
             <span>{confirmLabel}</span>
           </button>
         </div>

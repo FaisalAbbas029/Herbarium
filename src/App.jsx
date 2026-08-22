@@ -39,7 +39,7 @@ function AppContent() {
     return <div className="min-h-screen bg-[#FAF8F5] flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-3 border-[#1F4529] border-t-transparent rounded-full animate-spin" />
         <div className="font-serif-heading text-sm text-[#1F4529] font-bold tracking-wider uppercase">
-          Sylva Herbarium Archive
+          Gilgit-Baltistan Herbarium Archive
         </div>
       </div>;
   }

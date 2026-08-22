@@ -65,8 +65,8 @@ const AdminDashboardPage = ({ onNavigate }) => {
           Welcome back, {user?.name}
         </h1>
         <p className="text-xs text-[#566158]">
-          Sylva Herbarium Curatorial System • Role:{" "}
-          <strong className="text-[#1F4529] uppercase">{user?.role}</strong>
+          Gilgit-Baltistan Herbarium Archive Admin Panel • Role:{" "}
+          <strong className="text-[#1F4529] uppercase">{user?.role === "curator" ? "Admin" : user?.role || "Admin"}</strong>
         </p>
       </div>
 
