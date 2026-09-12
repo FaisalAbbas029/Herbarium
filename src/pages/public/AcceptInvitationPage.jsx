@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Shield, CheckCircle2, AlertCircle, Lock, ArrowRight } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUserShield,
+  faCircleCheck,
+  faCircleExclamation,
+  faLock,
+  faArrowRight
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 const AcceptInvitationPage = ({
@@ -60,10 +67,10 @@ const AcceptInvitationPage = ({
       </div>;
   }
   return <div className="max-w-md mx-auto my-16 px-4">
-      <div className="bg-white border border-[#E0D9CE] rounded-sm p-8 shadow-sm space-y-6">
+      <div className="bg-white border border-[#E0D9CE] rounded-sm p-5 sm:p-8 shadow-sm space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-sm bg-[#EBF3ED] text-[#1F4529] mx-auto flex items-center justify-center">
-            <Shield className="w-6 h-6" />
+            <FontAwesomeIcon icon={faUserShield} className="w-6 h-6" />
           </div>
           <h1 className="font-serif-heading text-2xl font-bold text-[#1C241E]">
             Accept Curator Invitation
@@ -74,12 +81,12 @@ const AcceptInvitationPage = ({
         </div>
 
         {error && <div className="p-3.5 bg-[#FDF2F2] border border-[#F5C6C6] text-[#8F2D14] text-xs rounded-sm flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <FontAwesomeIcon icon={faCircleExclamation} className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>}
 
         {success ? <div className="p-4 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] text-xs rounded-sm space-y-2 text-center">
-            <CheckCircle2 className="w-6 h-6 mx-auto text-[#2D5A3D]" />
+            <FontAwesomeIcon icon={faCircleCheck} className="w-6 h-6 mx-auto text-[#2D5A3D]" />
             <p className="font-bold">Account Activated Successfully!</p>
             <p className="text-[#566158]">Redirecting to Curator Portal...</p>
           </div> : invitation ? <form onSubmit={handleSubmit} className="space-y-4">
@@ -107,15 +114,15 @@ const AcceptInvitationPage = ({
                 Create Password (Min. 8 characters)
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#8E9990] absolute left-3 top-1/2 -translate-y-1/2" />
+                <FontAwesomeIcon icon={faLock} className="w-3.5 h-3.5 text-[#8E9990] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
-    type="password"
-    required
-    value={password}
-    onChange={(e) => setPassword(e.target.value)}
-    placeholder="••••••••"
-    className="w-full pl-9 pr-3.5 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:outline-hidden focus:ring-1 focus:ring-[#1F4529]"
-  />
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-9 pr-3.5 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:outline-hidden focus:ring-1 focus:ring-[#1F4529]"
+                />
               </div>
             </div>
 
@@ -124,24 +131,24 @@ const AcceptInvitationPage = ({
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#8E9990] absolute left-3 top-1/2 -translate-y-1/2" />
+                <FontAwesomeIcon icon={faLock} className="w-3.5 h-3.5 text-[#8E9990] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
-    type="password"
-    required
-    value={confirmPassword}
-    onChange={(e) => setConfirmPassword(e.target.value)}
-    placeholder="••••••••"
-    className="w-full pl-9 pr-3.5 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:outline-hidden focus:ring-1 focus:ring-[#1F4529]"
-  />
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-9 pr-3.5 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:outline-hidden focus:ring-1 focus:ring-[#1F4529]"
+                />
               </div>
             </div>
 
             <button
-    type="submit"
-    disabled={isSubmitting}
-    className="w-full py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-  >
-              {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" />}
               <span>Complete Setup & Enter Archive</span>
             </button>
           </form> : null}

@@ -1,23 +1,28 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  ArrowLeft,
-  Calendar,
-  MapPin,
-  User,
-  ZoomIn,
-  Copy,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Info,
-  Sparkles,
-  TreeDeciduous
-} from "lucide-react";
+  faArrowLeft,
+  faCalendarDays,
+  faLocationDot,
+  faLocationCrosshairs,
+  faArrowUpRightFromSquare,
+  faUser,
+  faMagnifyingGlassPlus,
+  faCopy,
+  faCheck,
+  faChevronLeft,
+  faChevronRight,
+  faCircleInfo,
+  faFlask,
+  faTree
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
+import { getSpecimenGeoData, formatCoordinateDisplay } from "../../utils/location.js";
 import { ConservationBadge } from "../../components/common/ConservationBadge.jsx";
 import { PhotoGalleryModal } from "../../components/common/PhotoGalleryModal.jsx";
 import { SpecimenCard } from "../../components/common/SpecimenCard.jsx";
 import { SpecimenImage } from "../../components/common/SpecimenImage.jsx";
+import { SpecimenMapView } from "../../components/common/SpecimenMapView.jsx";
 const SpecimenDetailPage = ({
   specimenId,
   onNavigate
@@ -80,6 +85,7 @@ const SpecimenDetailPage = ({
     month: "long",
     day: "numeric"
   }) : "Not Recorded";
+  const geo = getSpecimenGeoData(specimen);
   const updatedDate = new Date(specimen.updatedAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
@@ -100,14 +106,14 @@ const SpecimenDetailPage = ({
         onClick={() => onNavigate("/search")}
         className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#47663B] hover:text-[#1F4529] transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5 shrink-0" />
         <span>Back to Catalog Search</span>
       </button>
 
-      <div className="flex items-center gap-3 text-xs text-[#6E7570] font-mono-acc">
-        <span>Accession: <strong className="text-[#1C241E]">{specimen.accessionNumber}</strong></span>
-        <span>•</span>
-        <span>Last updated: {updatedDate}</span>
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[#6E7570] font-mono-acc">
+        <span className="truncate">Accession: <strong className="text-[#1C241E]">{specimen.accessionNumber}</strong></span>
+        <span className="hidden sm:inline">•</span>
+        <span className="truncate">Last updated: {updatedDate}</span>
       </div>
     </div>
 
@@ -147,7 +153,7 @@ const SpecimenDetailPage = ({
             <SpecimenImage
               src={activePhoto?.storageUrl}
               alt={activePhoto?.altText || specimen.scientificName}
-              className="w-full h-full object-contain cursor-zoom-in"
+              className="w-full h-full object-cover object-center cursor-zoom-in"
               fallbackClassName="w-full h-full"
               onClick={() => activePhoto && setIsGalleryModalOpen(true)}
             />
@@ -160,7 +166,7 @@ const SpecimenDetailPage = ({
               className="absolute top-3 right-3 p-2 bg-[#1C2820]/80 hover:bg-[#1C2820] text-white rounded-sm backdrop-blur-xs transition-all shadow-md flex items-center gap-1 text-xs"
               title="Inspect high-resolution micrograph"
             >
-              <ZoomIn className="w-4 h-4" />
+              <FontAwesomeIcon icon={faMagnifyingGlassPlus} className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Inspect Micrograph</span>
             </button>
 
@@ -180,14 +186,14 @@ const SpecimenDetailPage = ({
                 className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/40 hover:bg-black/70 text-white rounded-full transition-opacity opacity-0 group-hover:opacity-100"
                 aria-label="Previous photo"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <FontAwesomeIcon icon={faChevronLeft} className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setActivePhotoIndex((prev) => (prev + 1) % photos.length)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/40 hover:bg-black/70 text-white rounded-full transition-opacity opacity-0 group-hover:opacity-100"
                 aria-label="Next photo"
               >
-                <ChevronRight className="w-5 h-5" />
+                <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4" />
               </button>
             </>}
           </div>
@@ -212,7 +218,7 @@ const SpecimenDetailPage = ({
             <SpecimenImage
               src={p.storageUrl}
               alt={p.altText || ""}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover object-center"
               fallbackClassName="w-full h-full"
             />
             {p.isPrimary && <span className="absolute bottom-0 inset-x-0 bg-[#1F4529] text-[8px] text-center font-bold text-white uppercase">
@@ -265,7 +271,7 @@ const SpecimenDetailPage = ({
 
           <div className="space-y-3 text-xs">
             <div className="flex items-start gap-2.5">
-              <User className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
+              <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5 text-[#47663B] shrink-0 mt-0.5" />
               <div>
                 <span className="text-[#6E7570] block uppercase font-semibold text-[10px]">Collector(s)</span>
                 <span className="text-[#1C241E] font-medium">{specimen.collectorName || "GB Herbarium Field Team"}</span>
@@ -273,7 +279,7 @@ const SpecimenDetailPage = ({
             </div>
 
             <div className="flex items-start gap-2.5">
-              <Calendar className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
+              <FontAwesomeIcon icon={faCalendarDays} className="w-3.5 h-3.5 text-[#47663B] shrink-0 mt-0.5" />
               <div>
                 <span className="text-[#6E7570] block uppercase font-semibold text-[10px]">Collection Date</span>
                 <span className="text-[#1C241E] font-mono-acc font-medium">{formattedDate}</span>
@@ -281,13 +287,57 @@ const SpecimenDetailPage = ({
             </div>
 
             <div className="flex items-start gap-2.5">
-              <MapPin className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
-              <div>
-                <span className="text-[#6E7570] block uppercase font-semibold text-[10px]">Site & Region</span>
-                <span className="text-[#1C241E] font-medium">{specimen.location || specimen.collectionLocation || specimen.region}</span>
-                {specimen.coordinates && <div className="mt-1 font-mono-acc text-[11px] text-[#47663B] bg-[#F3EFEA] px-2 py-0.5 rounded-xs inline-block">
-                  GPS: {specimen.coordinates}
-                </div>}
+              <FontAwesomeIcon icon={faLocationDot} className="w-3.5 h-3.5 text-[#47663B] shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1">
+                <span className="text-[#6E7570] block uppercase font-semibold text-[10px]">Collection Location</span>
+                <span className="text-[#1C241E] font-medium block">
+                  {specimen.collectionLocation || specimen.location || specimen.region}
+                </span>
+
+                {/* Stored Coordinates & Elevation Details */}
+                <div className="mt-2.5 p-3 bg-[#FAF8F5] border border-[#E0D9CE] rounded-xs space-y-2">
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold tracking-wider text-[#6E7570] block">Latitude</span>
+                      <span className="font-mono-acc font-bold text-[#1C241E] text-[11px]">
+                        {geo.latitude !== null ? geo.latitude : "—"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold tracking-wider text-[#6E7570] block">Longitude</span>
+                      <span className="font-mono-acc font-bold text-[#1C241E] text-[11px]">
+                        {geo.longitude !== null ? geo.longitude : "—"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold tracking-wider text-[#6E7570] block">Elevation</span>
+                      <span className="font-mono-acc font-bold text-[#1C241E] text-[11px]">
+                        {geo.elevation || "—"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {geo.hasCoordinates ? (
+                    <div className="pt-2 border-t border-[#EDE7DD]">
+                      <a
+                        href={geo.googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors shadow-xs group"
+                        title={`View ${specimen.scientificName} collection location on Google Maps`}
+                      >
+                        <FontAwesomeIcon icon={faLocationDot} className="w-3.5 h-3.5 text-[#D8E6DC] group-hover:scale-110 transition-transform" />
+                        <span>View on Google Maps</span>
+                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-3 h-3 opacity-80" />
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="pt-2 border-t border-[#EDE7DD] flex items-center gap-1.5 text-[11px] text-[#8E9990]">
+                      <FontAwesomeIcon icon={faLocationCrosshairs} className="w-3.5 h-3.5" />
+                      <span>Location not available</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -306,10 +356,10 @@ const SpecimenDetailPage = ({
               className="inline-flex items-center gap-1 text-xs text-[#1F4529] hover:underline font-semibold"
             >
               {copiedCitation ? <>
-                <Check className="w-3.5 h-3.5 text-[#2D5A3D]" />
+                <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-[#2D5A3D]" />
                 <span>Copied!</span>
               </> : <>
-                <Copy className="w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faCopy} className="w-3.5 h-3.5" />
                 <span>Copy Citation</span>
               </>}
             </button>
@@ -330,7 +380,7 @@ const SpecimenDetailPage = ({
       }
       <section className="bg-white border border-[#E0D9CE] rounded-sm p-6 sm:p-8 space-y-4">
         <h2 className="font-serif-heading text-2xl font-bold text-[#1C241E] border-b border-[#EDE7DD] pb-3 flex items-center gap-2">
-          <TreeDeciduous className="w-5 h-5 text-[#47663B]" />
+          <FontAwesomeIcon icon={faTree} className="w-4 h-4 text-[#47663B]" />
           <span>Morphology & Botanical Description</span>
         </h2>
 
@@ -363,7 +413,7 @@ const SpecimenDetailPage = ({
       }
       <section className="bg-white border border-[#E0D9CE] rounded-sm p-6 sm:p-8 space-y-4">
         <h2 className="font-serif-heading text-2xl font-bold text-[#1C241E] border-b border-[#EDE7DD] pb-3 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-[#47663B]" />
+          <FontAwesomeIcon icon={faLocationDot} className="w-4 h-4 text-[#47663B]" />
           <span>Habitat & Geographic Distribution</span>
         </h2>
 
@@ -384,13 +434,25 @@ const SpecimenDetailPage = ({
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#6E7570] block">
                 Voucher Collection Location
               </span>
-              <p className="mt-1">{specimen.collectionLocation || specimen.location}</p>
+              <p className="mt-1 font-medium">{specimen.collectionLocation || specimen.location}</p>
             </div>
+
+            {/* Coordinates & Interactive Map */}
+            <SpecimenMapView
+              latitude={geo.latitude}
+              longitude={geo.longitude}
+              elevation={geo.elevation}
+              locality={specimen.collectionLocation || specimen.location}
+              title={specimen.scientificName}
+              heightClass="h-64 sm:h-80"
+              showCoordinatesBadge={true}
+              showGoogleMapsButton={true}
+            />
 
             {specimen.collectionNotes && <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#6E7570] block">
@@ -407,7 +469,7 @@ const SpecimenDetailPage = ({
       }
       <section className="bg-white border border-[#E0D9CE] rounded-sm p-6 sm:p-8 space-y-4">
         <h2 className="font-serif-heading text-2xl font-bold text-[#1C241E] border-b border-[#EDE7DD] pb-3 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-[#47663B]" />
+          <FontAwesomeIcon icon={faFlask} className="w-4 h-4 text-[#47663B]" />
           <span>Ethnobotany, Pharmacognosy & Ecological Roles</span>
         </h2>
 

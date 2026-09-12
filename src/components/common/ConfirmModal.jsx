@@ -1,4 +1,5 @@
-import { AlertTriangle, X } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTriangleExclamation, faXmark } from "@fortawesome/free-solid-svg-icons";
 const ConfirmModal = ({
   isOpen,
   title,
@@ -19,18 +20,19 @@ const ConfirmModal = ({
     aria-labelledby="modal-title"
   >
         <button
-    onClick={onCancel}
-    disabled={isLoading}
-    className="absolute top-4 right-4 text-[#6E7570] hover:text-[#1C241E] p-1"
-  >
-          <X className="w-5 h-5" />
+          onClick={onCancel}
+          disabled={isLoading}
+          className="absolute top-4 right-4 text-[#6E7570] hover:text-[#1C241E] p-1"
+          aria-label="Close modal"
+        >
+          <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
         </button>
 
         <div className="flex items-start gap-4">
           <div
-    className={`w-10 h-10 rounded-sm flex items-center justify-center shrink-0 ${isDestructive ? "bg-[#FDF2F2] text-[#8F2D14]" : "bg-[#EBF3ED] text-[#1F4529]"}`}
-  >
-            <AlertTriangle className="w-5 h-5" />
+            className={`w-10 h-10 rounded-sm flex items-center justify-center shrink-0 ${isDestructive ? "bg-[#FDF2F2] text-[#8F2D14]" : "bg-[#EBF3ED] text-[#1F4529]"}`}
+          >
+            <FontAwesomeIcon icon={faTriangleExclamation} className="w-5 h-5" />
           </div>
 
           <div className="space-y-2">
@@ -41,7 +43,7 @@ const ConfirmModal = ({
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#EDE7DD] pt-4">
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-[#EDE7DD] pt-4">
           <button
             type="button"
             onClick={onCancel}

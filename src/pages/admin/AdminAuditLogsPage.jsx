@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Shield
-} from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 const AdminAuditLogsPage = ({ onNavigate }) => {
@@ -30,7 +29,7 @@ const AdminAuditLogsPage = ({ onNavigate }) => {
   }, [actionFilter, isSuperAdmin]);
   if (!isSuperAdmin) {
     return <div className="bg-white border border-[#E0D9CE] rounded-sm p-8 text-center space-y-3">
-        <Shield className="w-8 h-8 text-[#8F2D14] mx-auto" />
+        <FontAwesomeIcon icon={faShieldHalved} className="w-8 h-8 text-[#8F2D14] mx-auto" />
         <h2 className="font-serif-heading text-lg font-bold text-[#1C241E]">
           Curatorial Audit Trail Restricted
         </h2>

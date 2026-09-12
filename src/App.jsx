@@ -17,19 +17,25 @@ import { AdminSpecimensListPage } from "./pages/admin/AdminSpecimensListPage.jsx
 import { AdminSpecimenEditorPage } from "./pages/admin/AdminSpecimenEditorPage.jsx";
 import { AdminTeamPage } from "./pages/admin/AdminTeamPage.jsx";
 import { AdminAuditLogsPage } from "./pages/admin/AdminAuditLogsPage.jsx";
-import { AdminProfilePage } from "./pages/admin/AdminProfilePage.jsx";
+function parseSearchParams(search) {
+  const params = new URLSearchParams(search);
+  const result = {};
+  if (params.get("family")) result.family = params.get("family");
+  if (params.get("query")) result.query = params.get("query");
+  if (params.get("conservationStatus")) result.conservationStatus = params.get("conservationStatus");
+  if (params.get("region")) result.region = params.get("region");
+  if (params.get("location")) result.location = params.get("location");
+  if (params.get("dateFrom")) result.dateFrom = params.get("dateFrom");
+  if (params.get("dateTo")) result.dateTo = params.get("dateTo");
+  if (params.get("sortBy")) result.sortBy = params.get("sortBy");
+  if (params.get("page")) result.page = parseInt(params.get("page"), 10) || 1;
+  return result;
+}
 function AppContent() {
   const [currentPath, setCurrentPath] = useState(
     window.location.pathname + window.location.search
   );
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem("gb_herbarium_public_theme") ?? localStorage.getItem("gb_herbarium_theme");
-    return savedTheme === "dark";
-  });
   const { isAuthenticated, isLoading } = useAuth();
-  useEffect(() => {
-    localStorage.setItem("gb_herbarium_public_theme", isDarkMode ? "dark" : "light");
-  }, [isDarkMode]);
   useEffect(() => {
     const handlePopState = () => {
       setCurrentPath(window.location.pathname + window.location.search);
@@ -74,11 +80,9 @@ function AppContent() {
       currentAdminTab = "team";
     } else if (pathname.startsWith("/admin/audit-logs")) {
       currentAdminTab = "audit-logs";
-    } else if (pathname.startsWith("/admin/profile")) {
-      currentAdminTab = "profile";
     }
     return <AdminLayout currentAdminTab={currentAdminTab} onNavigate={handleNavigate}>
-        {pathname === "/admin" || pathname === "/admin/dashboard" ? <AdminDashboardPage onNavigate={handleNavigate} /> : pathname === "/admin/profile" ? <AdminProfilePage /> : pathname === "/admin/specimens" ? <AdminSpecimensListPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens/new" ? <AdminSpecimenEditorPage onNavigate={handleNavigate} /> : pathname.startsWith("/admin/specimens/edit/") ? <AdminSpecimenEditorPage
+        {pathname === "/admin" || pathname === "/admin/dashboard" ? <AdminDashboardPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens" ? <AdminSpecimensListPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens/new" ? <AdminSpecimenEditorPage onNavigate={handleNavigate} /> : pathname.startsWith("/admin/specimens/edit/") ? <AdminSpecimenEditorPage
       specimenId={pathname.replace("/admin/specimens/edit/", "")}
       onNavigate={handleNavigate}
     /> : pathname === "/admin/team" ? <AdminTeamPage onNavigate={handleNavigate} /> : pathname === "/admin/audit-logs" ? <AdminAuditLogsPage onNavigate={handleNavigate} /> : <AdminDashboardPage onNavigate={handleNavigate} />}
@@ -88,7 +92,8 @@ function AppContent() {
   if (pathname === "/" || pathname === "/home") {
     publicPage = <HomePage onNavigate={handleNavigate} />;
   } else if (pathname === "/search") {
-    publicPage = <SearchResultsPage onNavigate={handleNavigate} />;
+    const searchParams = parseSearchParams(currentPath.split("?")[1] ? "?" + currentPath.split("?")[1] : "");
+    publicPage = <SearchResultsPage key={currentPath} initialParams={searchParams} onNavigate={handleNavigate} />;
   } else if (pathname.startsWith("/specimen/")) {
     const specimenId = pathname.replace("/specimen/", "");
     publicPage = <SpecimenDetailPage specimenId={specimenId} onNavigate={handleNavigate} />;
@@ -99,19 +104,17 @@ function AppContent() {
   } else if (pathname === "/contact") {
     publicPage = <ContactPage onNavigate={handleNavigate} />;
   } else if (pathname === "/accept-invitation") {
-    const invitationToken = new URLSearchParams(currentPath.split("?")[1] || "").get("token");
-    publicPage = <AcceptInvitationPage token={invitationToken} onNavigate={handleNavigate} />;
+    publicPage = <AcceptInvitationPage onNavigate={handleNavigate} />;
   } else {
     publicPage = <NotFoundPage onNavigate={handleNavigate} />;
   }
-  return <div className={`public-theme min-h-screen flex flex-col bg-[#FAF8F5] text-[#1C241E] ${isDarkMode ? "dark" : "light"}`}>
-      <Navbar
-        currentPath={pathname}
-        onNavigate={handleNavigate}
-        isDarkMode={isDarkMode}
-        onToggleTheme={() => setIsDarkMode((current) => !current)}
-      />
-      <main className="flex-1">{publicPage}</main>
+  return <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1C241E]">
+      <Navbar currentPath={pathname} onNavigate={handleNavigate} />
+      <main className="flex-1">
+        <div key={pathname} className="animate-page-enter">
+          {publicPage}
+        </div>
+      </main>
       <Footer onNavigate={handleNavigate} />
     </div>;
 }

@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Layers,
-  FileEdit,
-  Sparkles,
-  Users,
-  History,
-  ArrowRight,
-  PlusCircle,
-  Eye,
-  Shield
-} from "lucide-react";
+  faPenToSquare,
+  faBoxArchive,
+  faUsers,
+  faClockRotateLeft,
+  faArrowRight,
+  faPlus,
+  faEye,
+  faShieldHalved
+} from "@fortawesome/free-solid-svg-icons";
+import { faPagelines } from "@fortawesome/free-brands-svg-icons";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { SpecimenImage } from "../../components/common/SpecimenImage.jsx";
@@ -47,7 +48,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
   if (isLoading) {
     return <div className="space-y-6 animate-pulse">
       <div className="h-24 bg-white border border-[#E0D9CE] rounded-sm" />
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => <div key={i} className="h-28 bg-white border border-[#E0D9CE] rounded-sm" />)}
       </div>
     </div>;
@@ -56,7 +57,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
     {
       /* Welcome Banner */
     }
-    <div className="bg-white border border-[#E0D9CE] rounded-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="bg-white border border-[#E0D9CE] rounded-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div className="space-y-1">
         <div className="text-xs uppercase font-bold tracking-widest text-[#47663B]">
           Archival Management
@@ -75,7 +76,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
           onClick={() => onNavigate("/admin/specimens/new")}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors shadow-xs"
         >
-          <PlusCircle className="w-4 h-4" />
+          <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" />
           <span>Add Specimen Voucher</span>
         </button>
       </div>
@@ -84,11 +85,11 @@ const AdminDashboardPage = ({ onNavigate }) => {
     {
       /* Metrics Row */
     }
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="bg-white border border-[#E0D9CE] rounded-sm p-5 space-y-2">
         <div className="flex items-center justify-between text-[#6E7570]">
           <span className="text-xs uppercase font-semibold tracking-wider">Total Vouchers</span>
-          <Layers className="w-4 h-4 text-[#2D5A3D]" />
+          <FontAwesomeIcon icon={faBoxArchive} className="w-4 h-4 text-[#2D5A3D]" />
         </div>
         <div className="font-serif-heading text-3xl font-bold text-[#1C241E]">
           {stats?.totalSpecimens ?? 0}
@@ -103,7 +104,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
       <div className="bg-white border border-[#E0D9CE] rounded-sm p-5 space-y-2">
         <div className="flex items-center justify-between text-[#6E7570]">
           <span className="text-xs uppercase font-semibold tracking-wider">Botanical Families</span>
-          <Sparkles className="w-4 h-4 text-[#2D5A3D]" />
+          <FontAwesomeIcon icon={faPagelines} className="w-4 h-4" style={{ color: "rgb(30, 48, 80)" }} />
         </div>
         <div className="font-serif-heading text-3xl font-bold text-[#1C241E]">
           {stats?.totalFamilies ?? 0}
@@ -116,7 +117,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
       <div className="bg-white border border-[#E0D9CE] rounded-sm p-5 space-y-2">
         <div className="flex items-center justify-between text-[#6E7570]">
           <span className="text-xs uppercase font-semibold tracking-wider">Digitized Photos</span>
-          <Eye className="w-4 h-4 text-[#2D5A3D]" />
+          <FontAwesomeIcon icon={faEye} className="w-4 h-4 text-[#2D5A3D]" />
         </div>
         <div className="font-serif-heading text-3xl font-bold text-[#1C241E]">
           {stats?.totalPhotos ?? 0}
@@ -127,7 +128,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
       <div className="bg-white border border-[#E0D9CE] rounded-sm p-5 space-y-2">
         <div className="flex items-center justify-between text-[#6E7570]">
           <span className="text-xs uppercase font-semibold tracking-wider">Recent Activity</span>
-          <Users className="w-4 h-4 text-[#2D5A3D]" />
+          <FontAwesomeIcon icon={faUsers} className="w-4 h-4 text-[#2D5A3D]" />
         </div>
         <div className="font-serif-heading text-3xl font-bold text-[#1C241E]">
           {stats?.addedThisMonth ?? 0}
@@ -155,27 +156,27 @@ const AdminDashboardPage = ({ onNavigate }) => {
             className="text-xs font-semibold text-[#1F4529] hover:underline inline-flex items-center gap-1"
           >
             <span>View Full Catalog</span>
-            <ArrowRight className="w-3 h-3" />
+            <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" />
           </button>
         </div>
 
         <div className="bg-white border border-[#E0D9CE] rounded-sm divide-y divide-[#EDE7DD] overflow-hidden">
           {recentSpecimens.length === 0 ? <div className="p-8 text-center text-xs text-[#6E7570]">No specimens cataloged yet.</div> : recentSpecimens.map((specimen) => <div
             key={specimen.id}
-            className="p-4 flex items-center justify-between gap-4 hover:bg-[#FAF8F5] transition-colors"
+            className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:bg-[#FAF8F5] transition-colors"
           >
-            <div className="flex items-center gap-3.5 min-w-0">
+            <div className="flex items-center gap-3 min-w-0">
               <div className="w-12 h-12 rounded-xs bg-[#F3EFEA] overflow-hidden shrink-0 border border-[#E0D9CE]">
                 <SpecimenImage
                   src={specimen.photos?.find((photo) => photo.isPrimary)?.storageUrl || specimen.photos?.[0]?.storageUrl}
                   alt={specimen.scientificName}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover object-center"
                   fallbackClassName="w-full h-full"
                 />
               </div>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-[11px] font-mono-acc text-[#6E7570]">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 text-[11px] font-mono-acc text-[#6E7570] flex-wrap">
                   <span className="font-bold text-[#1F4529]">{specimen.accessionNumber}</span>
                   <span>•</span>
                   <span className="uppercase">{specimen.family}</span>
@@ -187,26 +188,30 @@ const AdminDashboardPage = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#EDE7DD]">
               {specimen.status === "DRAFT" ? <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-xs bg-[#A45D25] text-white">
                 Draft
               </span> : <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-xs bg-[#2D5A3D] text-white">
                 Published
               </span>}
-              <button
-                onClick={() => onNavigate(`/admin/specimens/edit/${specimen.id}`)}
-                className="p-1.5 text-[#566158] hover:text-[#1F4529] hover:bg-[#EAE5DE] rounded-xs transition-colors"
-                title="Edit Specimen Record"
-              >
-                <FileEdit className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => onNavigate(`/specimen/${specimen.id}`)}
-                className="p-1.5 text-[#566158] hover:text-[#1F4529] hover:bg-[#EAE5DE] rounded-xs transition-colors"
-                title="View Public Sheet"
-              >
-                <Eye className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onNavigate(`/admin/specimens/edit/${specimen.id}`)}
+                  className="p-1.5 text-[#566158] hover:text-[#1F4529] hover:bg-[#EAE5DE] rounded-xs transition-colors"
+                  title="Edit Specimen Record"
+                  aria-label="Edit Specimen Record"
+                >
+                  <FontAwesomeIcon icon={faPenToSquare} className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => onNavigate(`/specimen/${specimen.id}`)}
+                  className="p-1.5 text-[#566158] hover:text-[#1F4529] hover:bg-[#EAE5DE] rounded-xs transition-colors"
+                  title="View Public Sheet"
+                  aria-label="View Public Sheet"
+                >
+                  <FontAwesomeIcon icon={faEye} className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>)}
         </div>
@@ -218,7 +223,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
       <div className="lg:col-span-5 space-y-4">
         <div className="flex items-center justify-between border-b border-[#E0D9CE] pb-2">
           <h2 className="font-serif-heading text-lg font-bold text-[#1C241E] flex items-center gap-2">
-            <History className="w-4 h-4 text-[#2D5A3D]" />
+            <FontAwesomeIcon icon={faClockRotateLeft} className="w-3.5 h-3.5 text-[#2D5A3D]" />
             <span>Curatorial Audit Trail</span>
           </h2>
           {isSuperAdmin && <button
@@ -260,7 +265,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
         }
         <div className="bg-[#FAF8F5] border border-[#E0D9CE] rounded-sm p-4 space-y-2 text-xs">
           <div className="font-bold text-[#1C241E] uppercase text-[11px] flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-[#47663B]" />
+            <FontAwesomeIcon icon={faShieldHalved} className="w-3.5 h-3.5 text-[#47663B]" />
             <span>Curatorial Guidelines Reminder</span>
           </div>
           <p className="text-[#566158] leading-relaxed">

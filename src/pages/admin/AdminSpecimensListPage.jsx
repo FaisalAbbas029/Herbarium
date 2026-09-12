@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Search,
-  PlusCircle,
-  FileEdit,
-  Trash2,
-  Eye,
-  ArrowUpDown,
-  ChevronLeft,
-  ChevronRight
-} from "lucide-react";
+  faMagnifyingGlass,
+  faPlus,
+  faPenToSquare,
+  faTrashCan,
+  faEye,
+  faArrowDownWideShort,
+  faChevronLeft,
+  faChevronRight
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 import { ConservationBadge } from "../../components/common/ConservationBadge.jsx";
 import { ConfirmModal } from "../../components/common/ConfirmModal.jsx";
@@ -102,7 +103,7 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
         onClick={() => onNavigate("/admin/specimens/new")}
         className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors shadow-xs whitespace-nowrap self-start sm:self-auto"
       >
-        <PlusCircle className="w-4 h-4" />
+        <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" />
         <span>New Specimen Entry</span>
       </button>
     </div>
@@ -123,7 +124,7 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
           /* Text Search */
         }
         <div className="relative">
-          <Search className="w-4 h-4 text-[#8E9990] absolute left-3 top-1/2 -translate-y-1/2" />
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="w-3.5 h-3.5 text-[#8E9990] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={query}
@@ -177,7 +178,7 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
           /* Sorting */
         }
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-4 h-4 text-[#6E7570] shrink-0" />
+          <FontAwesomeIcon icon={faArrowDownWideShort} className="w-3.5 h-3.5 text-[#6E7570] shrink-0" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -226,7 +227,7 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
                       <SpecimenImage
                         src={primaryPhoto?.storageUrl}
                         alt={specimen.scientificName}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover object-center"
                         fallbackClassName="w-full h-full"
                       />
                     </div>
@@ -276,24 +277,27 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
                       onClick={() => onNavigate(`/specimen/${specimen.id}`)}
                       className="p-1.5 text-[#566158] hover:text-[#1F4529] hover:bg-[#EAE5DE] rounded-xs transition-colors"
                       title="View Public Sheet"
+                      aria-label="View Public Sheet"
                     >
-                      <Eye className="w-4 h-4" />
+                      <FontAwesomeIcon icon={faEye} className="w-3.5 h-3.5" />
                     </button>
 
                     <button
                       onClick={() => onNavigate(`/admin/specimens/edit/${specimen.id}`)}
                       className="p-1.5 text-[#1F4529] hover:bg-[#EBF3ED] rounded-xs transition-colors"
                       title="Edit Specimen"
+                      aria-label="Edit Specimen"
                     >
-                      <FileEdit className="w-4 h-4" />
+                      <FontAwesomeIcon icon={faPenToSquare} className="w-3.5 h-3.5" />
                     </button>
 
                     <button
                       onClick={() => setSpecimenToDelete(specimen)}
                       className="p-1.5 text-[#8F2D14] hover:bg-[#FDF2F2] rounded-xs transition-colors"
                       title="Delete Specimen Voucher"
+                      aria-label="Delete Specimen Voucher"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <FontAwesomeIcon icon={faTrashCan} className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>
@@ -306,17 +310,17 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
       {
         /* Pagination Bar */
       }
-      {totalPages > 1 && <div className="flex items-center justify-between bg-[#FAF8F5] border-t border-[#E0D9CE] px-4 py-3 text-xs">
+      {totalPages > 1 && <div className="flex flex-wrap items-center justify-between gap-3 bg-[#FAF8F5] border-t border-[#E0D9CE] px-4 py-3 text-xs">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
           className="inline-flex items-center gap-1 px-3 py-1.5 font-semibold uppercase tracking-wider text-[#1C241E] border border-[#C7BEB1] rounded-sm hover:bg-white disabled:opacity-30"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3" />
           <span>Previous</span>
         </button>
 
-        <span className="text-[#566158]">
+        <span className="text-[#566158] order-last sm:order-none w-full sm:w-auto text-center">
           Page <strong className="text-[#1C241E] font-mono-acc">{page}</strong> of{" "}
           <strong className="text-[#1C241E] font-mono-acc">{totalPages}</strong> ({total} total records)
         </span>
@@ -327,7 +331,7 @@ const AdminSpecimensListPage = ({ onNavigate }) => {
           className="inline-flex items-center gap-1 px-3 py-1.5 font-semibold uppercase tracking-wider text-[#1C241E] border border-[#C7BEB1] rounded-sm hover:bg-white disabled:opacity-30"
         >
           <span>Next</span>
-          <ChevronRight className="w-4 h-4" />
+          <FontAwesomeIcon icon={faChevronRight} className="w-3 h-3" />
         </button>
       </div>}
     </div>

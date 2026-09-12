@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Users,
-  UserPlus,
-  Shield,
-  Copy,
-  Check,
-  Clock,
-  AlertCircle,
-  CheckCircle2
-} from "lucide-react";
+  faUsers,
+  faUserPlus,
+  faShieldHalved,
+  faCopy,
+  faCheck,
+  faClock,
+  faCircleExclamation,
+  faCircleCheck
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { ConfirmModal } from "../../components/common/ConfirmModal.jsx";
@@ -162,7 +163,7 @@ const AdminTeamPage = ({ onNavigate }) => {
   if (!isSuperAdmin) {
     return (
       <div className="bg-white border border-[#E0D9CE] rounded-sm p-8 text-center space-y-3">
-        <Shield className="w-8 h-8 text-[#8F2D14] mx-auto" />
+        <FontAwesomeIcon icon={faShieldHalved} className="w-8 h-8 text-[#8F2D14] mx-auto" />
         <h2 className="font-serif-heading text-lg font-bold text-[#1C241E]">
           Curatorial Access Restricted
         </h2>
@@ -199,7 +200,7 @@ const AdminTeamPage = ({ onNavigate }) => {
           }}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors shadow-xs self-start sm:self-auto"
         >
-          <UserPlus className="w-4 h-4" />
+          <FontAwesomeIcon icon={faUserPlus} className="w-3.5 h-3.5" />
           <span>Invite New Curator</span>
         </button>
       </div>
@@ -213,7 +214,7 @@ const AdminTeamPage = ({ onNavigate }) => {
       {successMsg && (
         <div className="p-3.5 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] text-xs rounded-sm flex items-center justify-between gap-2 animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[#1F4529] shrink-0" />
+            <FontAwesomeIcon icon={faCircleCheck} className="w-4 h-4 text-[#1F4529] shrink-0" />
             <span>{successMsg}</span>
           </div>
           <button
@@ -229,7 +230,7 @@ const AdminTeamPage = ({ onNavigate }) => {
       <div className="bg-white border border-[#E0D9CE] rounded-sm overflow-hidden shadow-xs">
         <div className="p-4 border-b border-[#EDE7DD] bg-[#FAF8F5] flex items-center justify-between">
           <h2 className="font-serif-heading text-sm font-bold text-[#1C241E] flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#2D5A3D]" />
+            <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5 text-[#2D5A3D]" />
             <span>Active Archival Curators ({users.length})</span>
           </h2>
         </div>
@@ -325,7 +326,7 @@ const AdminTeamPage = ({ onNavigate }) => {
       <div className="bg-white border border-[#E0D9CE] rounded-sm overflow-hidden shadow-xs">
         <div className="p-4 border-b border-[#EDE7DD] bg-[#FAF8F5] flex items-center justify-between">
           <h2 className="font-serif-heading text-sm font-bold text-[#1C241E] flex items-center gap-2">
-            <Clock className="w-4 h-4 text-[#A45D25]" />
+            <FontAwesomeIcon icon={faClock} className="w-3.5 h-3.5 text-[#A45D25]" />
             <span>Pending Staff Invitations ({invitations.length})</span>
           </h2>
         </div>
@@ -364,7 +365,7 @@ const AdminTeamPage = ({ onNavigate }) => {
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#C7BEB1] rounded-sm text-[11px] font-semibold text-[#1C241E] hover:bg-white transition-colors"
                       title="Copy invitation link"
                     >
-                      <Copy className="w-3.5 h-3.5 text-[#47663B]" />
+                      <FontAwesomeIcon icon={faCopy} className="w-3 h-3 text-[#47663B]" />
                       <span>Copy Link</span>
                     </button>
 
@@ -397,7 +398,7 @@ const AdminTeamPage = ({ onNavigate }) => {
           <div className="bg-white border border-[#E0D9CE] rounded-sm shadow-xl max-w-md w-full p-6 space-y-6 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#EDE7DD] pb-3">
               <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] flex items-center gap-2">
-                <UserPlus className="w-5 h-5 text-[#1F4529]" />
+                <FontAwesomeIcon icon={faUserPlus} className="w-4 h-4 text-[#1F4529]" />
                 <span>Invite Archival Curator</span>
               </h3>
               <button
@@ -410,7 +411,7 @@ const AdminTeamPage = ({ onNavigate }) => {
 
             {errorMsg && (
               <div className="p-3 bg-[#FDF2F2] border border-[#F5C6C6] text-[#8F2D14] rounded-sm flex items-center gap-2 text-xs">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+                <FontAwesomeIcon icon={faCircleExclamation} className="w-4 h-4 shrink-0" />
                 <span>{errorMsg}</span>
               </div>
             )}
@@ -419,7 +420,7 @@ const AdminTeamPage = ({ onNavigate }) => {
               <div className="space-y-4">
                 <div className="p-4 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] rounded-sm space-y-2 text-xs">
                   <div className="font-bold flex items-center gap-1.5">
-                    <Check className="w-4 h-4 text-[#1F4529]" />
+                    <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-[#1F4529]" />
                     <span>Invitation Created</span>
                   </div>
                   <p className="text-[11px] text-[#2D5A3D]">
@@ -435,7 +436,7 @@ const AdminTeamPage = ({ onNavigate }) => {
                     onClick={() => copyToClipboard(generatedInviteLink)}
                     className="flex-1 py-2 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center justify-center gap-2 shadow-xs"
                   >
-                    {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copiedLink ? <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" /> : <FontAwesomeIcon icon={faCopy} className="w-3.5 h-3.5" />}
                     <span>{copiedLink ? "Copied to Clipboard" : "Copy Invite Link"}</span>
                   </button>
 

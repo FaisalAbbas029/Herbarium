@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  ArrowLeft,
-  Save,
-  Image as ImageIcon,
-  Plus,
-  Trash2,
-  Check,
-  Star,
-  AlertCircle,
-  CheckCircle2
-} from "lucide-react";
+  faArrowLeft,
+  faFloppyDisk,
+  faFileImage,
+  faPlus,
+  faTrashCan,
+  faCheck,
+  faStar,
+  faCircleExclamation,
+  faCircleCheck,
+  faArrowUpRightFromSquare
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 import { SpecimenImage } from "../../components/common/SpecimenImage.jsx";
+import { SpecimenMapView } from "../../components/common/SpecimenMapView.jsx";
 const AdminSpecimenEditorPage = ({
   specimenId,
   onNavigate
@@ -33,6 +36,9 @@ const AdminSpecimenEditorPage = ({
     location: "",
     region: "Western Europe",
     coordinates: "",
+    latitude: "",
+    longitude: "",
+    elevation: "",
     habitat: "",
     description: "",
     morphology: "",
@@ -232,6 +238,9 @@ const AdminSpecimenEditorPage = ({
     try {
       const payload = {
         ...formData,
+        latitude: formData.latitude !== "" && formData.latitude !== null && !isNaN(Number(formData.latitude)) ? Number(formData.latitude) : (formData.latitude || null),
+        longitude: formData.longitude !== "" && formData.longitude !== null && !isNaN(Number(formData.longitude)) ? Number(formData.longitude) : (formData.longitude || null),
+        elevation: formData.elevation?.trim() || null,
         status: forceStatus || formData.status || "PUBLISHED"
       };
       if (isEditing && specimenId) {
@@ -283,11 +292,11 @@ const AdminSpecimenEditorPage = ({
         onClick={() => onNavigate("/admin/specimens")}
         className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#47663B] hover:text-[#1F4529]"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" />
         <span>Back to Specimens Catalog</span>
       </button>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           disabled={isSubmitting || isUploadingFile}
@@ -302,7 +311,7 @@ const AdminSpecimenEditorPage = ({
           onClick={(e) => handleSubmit(e, "PUBLISHED")}
           className="px-5 py-2 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center gap-2 shadow-xs"
         >
-          {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+          {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <FontAwesomeIcon icon={faFloppyDisk} className="w-3.5 h-3.5" />}
           <span>{isSubmitting ? "Publishing..." : isEditing ? "Save & Publish Changes" : "Save & Publish Specimen"}</span>
         </button>
       </div>
@@ -312,12 +321,12 @@ const AdminSpecimenEditorPage = ({
       /* Messages */
     }
     {successMessage && <div className="p-4 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] rounded-sm flex items-center gap-2.5 text-xs">
-      <CheckCircle2 className="w-5 h-5 text-[#2D5A3D] shrink-0" />
+      <FontAwesomeIcon icon={faCircleCheck} className="w-4 h-4 text-[#2D5A3D] shrink-0" />
       <span className="font-semibold">{successMessage}</span>
     </div>}
 
     {errorMessage && <div className="p-4 bg-[#FDF2F2] border border-[#F5C6C6] text-[#8F2D14] rounded-sm flex items-center gap-2.5 text-xs">
-      <AlertCircle className="w-5 h-5 shrink-0" />
+      <FontAwesomeIcon icon={faCircleExclamation} className="w-4 h-4 shrink-0" />
       <span>{errorMessage}</span>
     </div>}
 
@@ -573,6 +582,78 @@ const AdminSpecimenEditorPage = ({
           </div>
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+              Latitude (Decimal)
+            </label>
+            <input
+              type="number"
+              step="any"
+              name="latitude"
+              value={formData.latitude ?? ""}
+              onChange={handleInputChange}
+              placeholder="e.g. 30.3444"
+              className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm font-mono-acc"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+              Longitude (Decimal)
+            </label>
+            <input
+              type="number"
+              step="any"
+              name="longitude"
+              value={formData.longitude ?? ""}
+              onChange={handleInputChange}
+              placeholder="e.g. 119.4389"
+              className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm font-mono-acc"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+              Elevation / Altitude
+            </label>
+            <input
+              type="text"
+              name="elevation"
+              value={formData.elevation || ""}
+              onChange={handleInputChange}
+              placeholder="e.g. 850 m"
+              className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm font-mono-acc"
+            />
+          </div>
+        </div>
+
+        {/* Interactive Location Picker Map */}
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            Collection Site Georeference & Interactive Map
+          </label>
+          <SpecimenMapView
+            latitude={formData.latitude}
+            longitude={formData.longitude}
+            elevation={formData.elevation}
+            locality={formData.collectionLocation || formData.location}
+            title={formData.scientificName || "Specimen Collection Site"}
+            interactive={true}
+            heightClass="h-64 sm:h-80"
+            showCoordinatesBadge={true}
+            showGoogleMapsButton={true}
+            onLocationSelect={({ lat, lng }) => {
+              setFormData((prev) => ({
+                ...prev,
+                latitude: lat,
+                longitude: lng,
+                coordinates: `${lat}, ${lng}`
+              }));
+            }}
+          />
+        </div>
+
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
             Habitat, Substrate & Altitude
@@ -595,7 +676,7 @@ const AdminSpecimenEditorPage = ({
         <div className="border-b border-[#EDE7DD] pb-3 flex items-center justify-between">
           <div>
             <h2 className="font-serif-heading text-lg font-bold text-[#1C241E] flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-[#47663B]" />
+              <FontAwesomeIcon icon={faFileImage} className="w-4 h-4 text-[#47663B]" />
               <span>3. Photographic Micrographs & Voucher Plates</span>
             </h2>
             <p className="text-xs text-[#566158]">
@@ -616,7 +697,7 @@ const AdminSpecimenEditorPage = ({
               <SpecimenImage
                 src={photo.storageUrl}
                 alt={photo.altText || ""}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover object-center"
                 fallbackClassName="w-full h-full"
               />
               {photo.isPrimary && <span className="absolute top-2 left-2 bg-[#2D5A3D] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-xs">
@@ -636,11 +717,11 @@ const AdminSpecimenEditorPage = ({
                 onClick={() => handleSetPrimaryPhoto(idx)}
                 className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1F4529] hover:underline"
               >
-                <Star className="w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faStar} className="w-3 h-3" />
                 <span>Set as Primary</span>
               </button>}
               {photo.isPrimary && <span className="text-[11px] font-bold text-[#2D5A3D] flex items-center gap-1">
-                <Check className="w-3.5 h-3.5" /> Primary View
+                <FontAwesomeIcon icon={faCheck} className="w-3 h-3" /> Primary View
               </span>}
 
               <button
@@ -648,8 +729,9 @@ const AdminSpecimenEditorPage = ({
                 onClick={() => handleDeletePhoto(idx)}
                 className="p-1 text-[#8F2D14] hover:bg-[#FDF2F2] rounded-xs transition-colors ml-auto"
                 title="Remove Photo"
+                aria-label="Remove Photo"
               >
-                <Trash2 className="w-4 h-4" />
+                <FontAwesomeIcon icon={faTrashCan} className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>)}
@@ -695,7 +777,7 @@ const AdminSpecimenEditorPage = ({
                 <SpecimenImage
                   src={filePreviewUrl || newPhotoUrl}
                   alt="Selected specimen preview"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover object-center"
                   fallbackClassName="w-full h-full"
                 />
               </div>}
@@ -721,7 +803,7 @@ const AdminSpecimenEditorPage = ({
             disabled={!newPhotoUrl.trim() || isUploadingFile}
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2D5A3D] hover:bg-[#22452E] text-white text-xs font-semibold uppercase tracking-wider rounded-sm disabled:opacity-40 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <FontAwesomeIcon icon={faPlus} className="w-3 h-3" />
             <span>Attach Photograph to Record</span>
           </button>
         </div>
@@ -860,7 +942,7 @@ const AdminSpecimenEditorPage = ({
       {
         /* Bottom Save Action Bar */
       }
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E0D9CE]">
+      <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-[#E0D9CE]">
         <button
           type="button"
           onClick={() => onNavigate("/admin/specimens")}
@@ -881,7 +963,7 @@ const AdminSpecimenEditorPage = ({
           disabled={isSubmitting || isUploadingFile}
           className="px-6 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center gap-2 shadow-xs"
         >
-          {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+          {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <FontAwesomeIcon icon={faFloppyDisk} className="w-3.5 h-3.5" />}
           <span>{isSubmitting ? "Publishing..." : isEditing ? "Save & Publish Changes" : "Save & Publish Specimen"}</span>
         </button>
       </div>

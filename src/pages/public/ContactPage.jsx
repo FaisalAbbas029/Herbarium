@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEnvelope,
+  faLocationDot,
+  faPaperPlane,
+  faCircleCheck,
+  faCircleExclamation,
+  faClock
+} from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 const ContactPage = ({ onNavigate }) => {
   const [formData, setFormData] = useState({
@@ -53,7 +61,7 @@ const ContactPage = ({ onNavigate }) => {
           </h2>
 
           {successMessage && <div className="p-4 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] rounded-sm flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-[#2D5A3D]" />
+              <FontAwesomeIcon icon={faCircleCheck} className="w-5 h-5 shrink-0 mt-0.5 text-[#2D5A3D]" />
               <div className="text-xs sm:text-sm">
                 <p className="font-bold">Message Received</p>
                 <p className="mt-0.5">{successMessage}</p>
@@ -61,7 +69,7 @@ const ContactPage = ({ onNavigate }) => {
             </div>}
 
           {errorMessage && <div className="p-4 bg-[#FDF2F2] border border-[#F5C6C6] text-[#8F2D14] rounded-sm flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+              <FontAwesomeIcon icon={faCircleExclamation} className="w-5 h-5 shrink-0 mt-0.5" />
               <div className="text-xs sm:text-sm">
                 <p className="font-bold">Transmission Error</p>
                 <p className="mt-0.5">{errorMessage}</p>
@@ -127,11 +135,11 @@ const ContactPage = ({ onNavigate }) => {
             </div>
 
             <button
-    type="submit"
-    disabled={isSubmitting}
-    className="w-full sm:w-auto px-6 py-3 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-  >
-              {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="w-4 h-4" />}
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto px-6 py-3 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <FontAwesomeIcon icon={faPaperPlane} className="w-3.5 h-3.5" />}
               <span>Transmit Botanical Inquiry</span>
             </button>
           </form>
@@ -148,23 +156,30 @@ const ContactPage = ({ onNavigate }) => {
 
             <div className="space-y-3.5 text-xs text-[#566158]">
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
+                <FontAwesomeIcon icon={faLocationDot} className="w-4 h-4 text-[#47663B] shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-[#1C241E] block">Gilgit-Baltistan Herbarium Archive (SHB)</strong>
-                  <span>Wing C, Institute of Botanical Sciences</span>
-                  <br />
-                  <span>Reserve Botanical Station, Europe</span>
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=35.92485897764096,74.36684641557514"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#1F4529] transition-colors leading-relaxed"
+                  >
+                    Department of Plant Sciences, Karakoram International University, Gilgit, Gilgit-Baltistan, Pakistan
+                  </a>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#47663B] shrink-0" />
-                <span>gbherbarium@gmail.com</span>
+                <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4 text-[#47663B] shrink-0" />
+                <a href="mailto:gbherbarium@gmail.com" className="hover:text-[#1F4529] transition-colors">
+                  gbherbarium@gmail.com
+                </a>
               </div>
 
               <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-[#47663B] shrink-0" />
-                <span>Reading Room Hours: Mon–Fri, 09:00 – 17:00 CET</span>
+                <FontAwesomeIcon icon={faClock} className="w-4 h-4 text-[#47663B] shrink-0" />
+                <span>Reading Room Hours: Mon–Fri, 09:00 – 17:00</span>
               </div>
             </div>
           </div>

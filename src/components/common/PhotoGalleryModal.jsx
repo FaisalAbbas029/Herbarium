@@ -1,6 +1,14 @@
 import { SpecimenImage } from "./SpecimenImage.jsx";
 import { useState, useEffect } from "react";
-import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faXmark,
+  faChevronLeft,
+  faChevronRight,
+  faMagnifyingGlassPlus,
+  faMagnifyingGlassMinus,
+  faRotateLeft
+} from "@fortawesome/free-solid-svg-icons";
 const PhotoGalleryModal = ({
   photos,
   initialIndex = 0,
@@ -97,7 +105,7 @@ const PhotoGalleryModal = ({
             title="Zoom out"
             aria-label="Zoom out"
           >
-            <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <FontAwesomeIcon icon={faMagnifyingGlassMinus} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
           <span className="text-[10px] sm:text-xs font-mono-acc px-1 text-white/80">
             {Math.round(zoomLevel * 100)}%
@@ -109,7 +117,7 @@ const PhotoGalleryModal = ({
             title="Zoom in"
             aria-label="Zoom in"
           >
-            <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <FontAwesomeIcon icon={faMagnifyingGlassPlus} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
           <button
             onClick={resetZoom}
@@ -117,7 +125,7 @@ const PhotoGalleryModal = ({
             title="Reset Zoom"
             aria-label="Reset zoom"
           >
-            <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <FontAwesomeIcon icon={faRotateLeft} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
@@ -127,7 +135,7 @@ const PhotoGalleryModal = ({
           title="Close Gallery (Esc)"
           aria-label="Close photo gallery"
         >
-          <X className="w-5 h-5 sm:w-6 sm:h-6" />
+          <FontAwesomeIcon icon={faXmark} className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       </div>
     </div>
@@ -151,14 +159,14 @@ const PhotoGalleryModal = ({
           className="absolute left-2 sm:left-6 z-20 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/80 text-white transition-all transform hover:scale-105"
           aria-label="Previous photograph"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          <FontAwesomeIcon icon={faChevronLeft} className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
         <button
           onClick={handleNext}
           className="absolute right-2 sm:right-6 z-20 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/80 text-white transition-all transform hover:scale-105"
           aria-label="Next photograph"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          <FontAwesomeIcon icon={faChevronRight} className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       </>}
 
@@ -205,7 +213,7 @@ const PhotoGalleryModal = ({
           <SpecimenImage
             src={p.storageUrl}
             alt={p.altText || ""}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover object-center"
             fallbackClassName="w-full h-full"
           />
           {p.isPrimary && <span className="absolute bottom-0 inset-x-0 bg-[#2D5A3D] text-[8px] sm:text-[9px] text-center font-bold text-white uppercase">

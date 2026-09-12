@@ -1,8 +1,9 @@
-import { Leaf, Search, ArrowLeft } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLeaf, faArrowLeft, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 const NotFoundPage = ({ onNavigate }) => {
   return <div className="max-w-xl mx-auto px-4 py-24 text-center space-y-6">
       <div className="w-16 h-16 rounded-full bg-[#EBF3ED] text-[#1F4529] mx-auto flex items-center justify-center">
-        <Leaf className="w-8 h-8 text-[#47663B]" />
+        <FontAwesomeIcon icon={faLeaf} className="w-8 h-8 text-[#47663B]" />
       </div>
 
       <div className="space-y-2">
@@ -17,17 +18,17 @@ const NotFoundPage = ({ onNavigate }) => {
 
       <div className="flex items-center justify-center gap-3 pt-4">
         <button
-    onClick={() => onNavigate("/")}
-    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors"
-  >
-          <ArrowLeft className="w-4 h-4" />
+          onClick={() => onNavigate("/")}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" />
           <span>Return Home</span>
         </button>
         <button
-    onClick={() => onNavigate("/search")}
-    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-[#C7BEB1] hover:bg-[#F3EFEA] text-[#1C241E] text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors"
-  >
-          <Search className="w-4 h-4" />
+          onClick={() => onNavigate("/search")}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-[#C7BEB1] hover:bg-[#F3EFEA] text-[#1C241E] text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors"
+        >
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="w-3.5 h-3.5" />
           <span>Search Catalog</span>
         </button>
       </div>

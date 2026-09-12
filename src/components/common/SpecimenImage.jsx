@@ -19,9 +19,11 @@ const SpecimenImage = ({
 }) => {
     const resolvedSrc = getAssetUrl(src);
     const [hasError, setHasError] = useState(!resolvedSrc);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         setHasError(!resolvedSrc);
+        setIsLoaded(false);
     }, [resolvedSrc]);
 
     if (hasError) {
@@ -34,13 +36,21 @@ const SpecimenImage = ({
         </div>;
     }
 
-    return <img
-        {...imageProps}
-        src={resolvedSrc}
-        alt={alt}
-        className={className}
-        onError={() => setHasError(true)}
-    />;
+    return (
+      <div className="relative w-full h-full overflow-hidden">
+        {!isLoaded && (
+          <div className="absolute inset-0 bg-[#F3EFEA] skeleton-shimmer z-0" />
+        )}
+        <img
+          {...imageProps}
+          src={resolvedSrc}
+          alt={alt}
+          className={`${className} transition-opacity duration-500 ease-out ${isLoaded ? "opacity-100" : "opacity-0"}`}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => setHasError(true)}
+        />
+      </div>
+    );
 };
 
 export { SpecimenImage, getAssetUrl };

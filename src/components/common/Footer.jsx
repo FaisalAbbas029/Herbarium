@@ -1,4 +1,11 @@
-import { Leaf, ShieldCheck, MapPin, Mail, BookOpen } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faLeaf,
+  faShieldHalved,
+  faLocationDot,
+  faEnvelope,
+  faBookOpen
+} from "@fortawesome/free-solid-svg-icons";
 const Footer = ({ onNavigate }) => {
   return <footer className="bg-[#1C2820] text-[#D3DDD5] border-t border-[#2D3F33] mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
@@ -9,7 +16,7 @@ const Footer = ({ onNavigate }) => {
           <div className="space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-sm bg-[#2D5A3D] text-[#FAF8F5] flex items-center justify-center">
-                <Leaf className="w-4 h-4 text-[#D8E6DC]" />
+                <FontAwesomeIcon icon={faLeaf} className="w-4 h-4 text-[#D8E6DC]" />
               </div>
               <span className="font-display tracking-widest text-lg font-bold text-[#FAF8F5]">
                 GB Herbarium
@@ -19,7 +26,7 @@ const Footer = ({ onNavigate }) => {
               International Index Herbariorum Code: <strong className="text-white font-mono-acc">SHB</strong>. Dedicated to the systematic preservation, digitized taxonomy, and open botanical research of vascular flora and cryptogamic vouchers.
             </p>
             <div className="pt-2 flex items-center gap-2 text-xs text-[#8A9B8F]">
-              <ShieldCheck className="w-4 h-4 text-[#5A9E72]" />
+              <FontAwesomeIcon icon={faShieldHalved} className="w-4 h-4 text-[#5A9E72]" />
               <span>Compliant with Darwin Core & TDWG Standards</span>
             </div>
           </div>
@@ -119,15 +126,54 @@ const Footer = ({ onNavigate }) => {
             </h3>
             <div className="space-y-2.5 text-xs text-[#A4B3A8]">
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-[#5A9E72] shrink-0 mt-0.5" />
-                <span>Herbarium Wing, Department of Plant Sciences, Botanical Reserve Station</span>
+                <FontAwesomeIcon icon={faLocationDot} className="w-4 h-4 text-[#5A9E72] shrink-0 mt-0.5" />
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=35.92485897764096,74.36684641557514"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="View Karakoram International University on Google Maps"
+                  className="hover:text-[#5A9E72] transition-colors leading-relaxed"
+                >
+                  Department of Plant Sciences, Karakoram International University, Gilgit, Gilgit-Baltistan, Pakistan
+                </a>
               </div>
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#5A9E72] shrink-0" />
-                <span>gbherbarium@gmail.com</span>
+                <FontAwesomeIcon icon={faEnvelope} className="w-4 h-4 text-[#5A9E72] shrink-0" />
+                <a
+                  href="mailto:gbherbarium@gmail.com"
+                  aria-label="Email GB Herbarium"
+                  className="hover:text-[#5A9E72] transition-colors cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const mailtoUrl = "mailto:gbherbarium@gmail.com";
+                    const gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1&to=gbherbarium@gmail.com";
+                    // Try to open native mail client
+                    const iframe = document.createElement("iframe");
+                    iframe.style.display = "none";
+                    iframe.src = mailtoUrl;
+                    document.body.appendChild(iframe);
+                    setTimeout(() => {
+                      document.body.removeChild(iframe);
+                    }, 1000);
+                    // After a short delay, if still on page, offer Gmail fallback
+                    const start = Date.now();
+                    window.addEventListener("blur", function onBlur() {
+                      window.removeEventListener("blur", onBlur);
+                    });
+                    setTimeout(() => {
+                      if (Date.now() - start < 1500) {
+                        window.open(gmailUrl, "_blank", "noopener,noreferrer");
+                      }
+                    }, 1000);
+                    window.location.href = mailtoUrl;
+                  }}
+                >
+                  gbherbarium@gmail.com
+                </a>
               </div>
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-[#5A9E72] shrink-0" />
+                <FontAwesomeIcon icon={faBookOpen} className="w-4 h-4 text-[#5A9E72] shrink-0" />
                 <span>Open for Research Mon–Fri 09:00–17:00</span>
               </div>
             </div>
