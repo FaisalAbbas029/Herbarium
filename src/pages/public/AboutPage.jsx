@@ -299,6 +299,54 @@ const AboutPage = ({ onNavigate }) => {
               </p>
             </div>
           </ScrollReveal>
+
+          {/* Dr. Naila Abbas */}
+          <ScrollReveal delay={360}>
+            <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
+              <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
+                <img
+                  src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80"
+                  alt="Dr. Naila Abbas"
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                />
+              </div>
+              <div>
+                <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
+                  Dr. Naila Abbas
+                </h3>
+                <p className="text-xs uppercase font-semibold text-[#47663B]">
+                  Field Collections Coordinator &amp; Flora Surveyor
+                </p>
+              </div>
+              <p className="text-xs text-[#566158] leading-relaxed">
+                Ph.D. in Plant Ecology. Coordinates field collections, habitat surveys, voucher preparation, and georeferenced sampling across the western Himalaya.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {/* Dr. Omar Shah */}
+          <ScrollReveal delay={420}>
+            <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
+              <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
+                <img
+                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=300&q=80"
+                  alt="Dr. Omar Shah"
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                />
+              </div>
+              <div>
+                <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
+                  Dr. Omar Shah
+                </h3>
+                <p className="text-xs uppercase font-semibold text-[#47663B]">
+                  Lichenologist &amp; Conservation Geneticist
+                </p>
+              </div>
+              <p className="text-xs text-[#566158] leading-relaxed">
+                Ph.D. in Conservation Genetics. Studies lichen diversity, population structure, and genetic indicators of ecological change in high-altitude habitats.
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
 
