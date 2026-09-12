@@ -124,7 +124,7 @@ const Footer = ({ onNavigate }) => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#5A9E72] shrink-0" />
-                <span>curation@gb-herbarium.org</span>
+                <span>gbherbarium@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-[#5A9E72] shrink-0" />

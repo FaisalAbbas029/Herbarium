@@ -22,6 +22,12 @@ import bcrypt from "bcryptjs";
 const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.resolve(process.cwd(), "data");
 const UPLOADS_DIR = process.env.UPLOADS_DIR ? path.resolve(process.env.UPLOADS_DIR) : path.resolve(process.cwd(), "uploads");
 const DB_FILE = path.join(DATA_DIR, "herbarium.json");
+const normalizeBinomen = (scientificName) => String(scientificName || "")
+  .trim()
+  .toLowerCase()
+  .split(/\s+/)
+  .slice(0, 2)
+  .join(" ");
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
@@ -605,7 +611,22 @@ class HerbariumDatabase {
     if (fs.existsSync(DB_FILE)) {
       try {
         const raw = fs.readFileSync(DB_FILE, "utf-8");
-        return JSON.parse(raw);
+        const data = JSON.parse(raw);
+        const seenScientificNames = new Set();
+        const originalSpecimens = data.specimens || [];
+        data.specimens = originalSpecimens.filter((specimen) => {
+          const scientificName = normalizeBinomen(specimen.scientificName);
+          if (!scientificName || seenScientificNames.has(scientificName)) return false;
+          seenScientificNames.add(scientificName);
+          return true;
+        });
+        if (data.specimens.length !== originalSpecimens.length) {
+          const keptIds = new Set(data.specimens.map((specimen) => specimen.id));
+          data.specimenPhotos = (data.specimenPhotos || []).filter((photo) => keptIds.has(photo.specimenId));
+          this.persist(data);
+          console.warn("Removed duplicate scientific-name specimen records from the catalog.");
+        }
+        return data;
       } catch (err) {
         console.error("Error reading database file, re-initializing:", err);
       }
@@ -755,6 +776,10 @@ class HerbariumDatabase {
   findUserById(id) {
     return this.data.users.find((u) => u.id === id);
   }
+  findUserByEmailExcluding(email, excludeId) {
+    const normalizedEmail = email.toLowerCase().trim();
+    return this.data.users.find((user) => user.email.toLowerCase() === normalizedEmail && user.id !== excludeId);
+  }
   getAllUsers() {
     return this.data.users.map(({ passwordHash, ...safeUser }) => safeUser);
   }
@@ -780,6 +805,18 @@ class HerbariumDatabase {
     const user = this.data.users.find((u) => u.id === userId);
     if (!user) return null;
     user.status = status;
+    this.persist();
+    const { passwordHash, ...safeUser } = user;
+    return safeUser;
+  }
+  updateUserProfile(userId, updates) {
+    const user = this.data.users.find((candidate) => candidate.id === userId);
+    if (!user) return null;
+    if (updates.name !== void 0) user.name = updates.name.trim();
+    if (updates.email !== void 0) user.email = updates.email.toLowerCase().trim();
+    if (updates.institution !== void 0) user.institution = updates.institution.trim();
+    if (updates.avatarUrl !== void 0) user.avatarUrl = updates.avatarUrl.trim();
+    if (updates.password) user.passwordHash = bcrypt.hashSync(updates.password, bcrypt.genSaltSync(10));
     this.persist();
     const { passwordHash, ...safeUser } = user;
     return safeUser;
@@ -990,7 +1027,18 @@ class HerbariumDatabase {
       (s) => s.accessionNumber.toLowerCase() === accessionNumber.toLowerCase().trim() && s.id !== excludeId
     );
   }
+  checkScientificNameExists(scientificName, excludeId) {
+    const normalizedName = normalizeBinomen(scientificName);
+    return this.data.specimens.some(
+      (s) => normalizeBinomen(s.scientificName) === normalizedName && s.id !== excludeId
+    );
+  }
   createSpecimen(data, user) {
+    if (this.checkScientificNameExists(data.scientificName)) {
+      const error = new Error(`Existing plant: ${String(data.scientificName).trim()}.`);
+      error.code = "DUPLICATE_SPECIMEN";
+      throw error;
+    }
     const id = `spec-${crypto.randomUUID().slice(0, 8)}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
     let photos = (data.photos || []).map((p, idx) => ({

@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import cors from "cors";
 import { db } from "./server/db.js";
+import { sendContactEmail } from "./server/mail.js";
 import {
   authManager,
   optionalAuthMiddleware,
@@ -194,6 +195,48 @@ app.post("/api/auth/logout", requireAuthMiddleware, (req, res) => {
     authManager.deleteSession(token);
   }
   return res.json({ success: true, message: "Logged out successfully." });
+});
+app.put("/api/auth/profile", requireAuthMiddleware, (req, res) => {
+  try {
+    const { name, email, institution, avatarUrl, currentPassword, newPassword } = req.body;
+    const normalizedAvatarUrl = typeof avatarUrl === "string" ? avatarUrl.trim() : "";
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: "Your name is required." });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      return res.status(400).json({ error: "Enter a valid email address." });
+    }
+    if (db.findUserByEmailExcluding(normalizedEmail, req.user.id)) {
+      return res.status(409).json({ error: "That email address is already used by another admin." });
+    }
+    if (normalizedAvatarUrl && !/^https?:\/\//i.test(normalizedAvatarUrl) && !/^\/uploads\//i.test(normalizedAvatarUrl)) {
+      return res.status(400).json({ error: "Profile picture must be a valid image URL or uploaded image path." });
+    }
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: "Enter your current password before choosing a new password." });
+      }
+      const account = db.findUserById(req.user.id);
+      if (!bcrypt.compareSync(currentPassword, account.passwordHash)) {
+        return res.status(401).json({ error: "Current password is incorrect." });
+      }
+      if (newPassword.length < 8) {
+        return res.status(400).json({ error: "New password must be at least 8 characters." });
+      }
+    }
+    const user = db.updateUserProfile(req.user.id, {
+      name,
+      email: normalizedEmail,
+      institution: institution || "",
+      avatarUrl: normalizedAvatarUrl,
+      password: newPassword
+    });
+    return res.json({ user, message: "Profile updated successfully." });
+  } catch (error) {
+    console.error("Profile update error:", error);
+    return res.status(500).json({ error: "Unable to update your profile." });
+  }
 });
 app.get("/api/team", requireAuthMiddleware, (req, res) => {
   try {
@@ -572,6 +615,12 @@ app.get("/api/specimens/check-accession/:acc", (req, res) => {
   const exists = db.checkAccessionExists(acc, excludeId);
   return res.json({ exists });
 });
+app.get("/api/specimens/check-scientific-name/:name", (req, res) => {
+  const { name } = req.params;
+  const excludeId = req.query.excludeId;
+  const exists = db.checkScientificNameExists(name, excludeId);
+  return res.json({ exists });
+});
 app.post("/api/specimens", requireAuthMiddleware, (req, res) => {
   try {
     const data = req.body;
@@ -591,7 +640,16 @@ app.post("/api/specimens", requireAuthMiddleware, (req, res) => {
       return res.status(400).json({ error: "Species epithet is required." });
     }
     if (db.checkAccessionExists(data.accessionNumber)) {
-      return res.status(400).json({ error: `This accession number (${data.accessionNumber}) already exists in the archive.` });
+      return res.status(409).json({
+        code: "DUPLICATE_SPECIMEN",
+        error: `Existing plant: ${data.scientificName.trim()}. Its accession number is ${data.accessionNumber.trim()}.`
+      });
+    }
+    if (db.checkScientificNameExists(data.scientificName)) {
+      return res.status(409).json({
+        code: "DUPLICATE_SPECIMEN",
+        error: `Existing plant: ${data.scientificName.trim()}.`
+      });
     }
     if (data.status === "PUBLISHED") {
       if (!data.photos || data.photos.length === 0) {
@@ -608,6 +666,9 @@ app.post("/api/specimens", requireAuthMiddleware, (req, res) => {
     });
   } catch (error) {
     console.error("Create specimen error:", error);
+    if (error.code === "DUPLICATE_SPECIMEN") {
+      return res.status(409).json({ code: error.code, error: error.message });
+    }
     return res.status(500).json({ error: error.message || "Something went wrong. Please try again." });
   }
 });
@@ -617,8 +678,17 @@ app.put("/api/specimens/:id", requireAuthMiddleware, (req, res) => {
     const updates = req.body;
     if (updates.accessionNumber) {
       if (db.checkAccessionExists(updates.accessionNumber, id)) {
-        return res.status(400).json({ error: `This accession number (${updates.accessionNumber}) already exists.` });
+        return res.status(409).json({
+          code: "DUPLICATE_SPECIMEN",
+          error: `Existing plant: ${updates.scientificName || "this specimen"}. Its accession number is ${updates.accessionNumber}.`
+        });
       }
+    }
+    if (updates.scientificName && db.checkScientificNameExists(updates.scientificName, id)) {
+      return res.status(409).json({
+        code: "DUPLICATE_SPECIMEN",
+        error: `Existing plant: ${updates.scientificName.trim()}.`
+      });
     }
     if (updates.status === "PUBLISHED") {
       const existing = db.getSpecimenById(id, true);
@@ -726,13 +796,7 @@ app.get("/api/public/stats", (req, res) => {
 // "mail" feature for this kind of archive site). Messages are validated
 // and saved to the database, but no outbound email is actually sent yet.
 //
-// EMAIL SENDING (development/demo note):
-// This is currently a development/demo implementation — submitted
-// inquiries are only stored in the database, not emailed anywhere. In
-// production, connect this endpoint (and the admin invitation endpoint
-// above) to a real email provider such as Resend, SendGrid, or Amazon SES,
-// and call it here after db.createContactMessage() succeeds.
-app.post("/api/contact", (req, res) => {
+app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
     if (!name || !email || !message) {
@@ -748,6 +812,16 @@ app.post("/api/contact", (req, res) => {
       subject: subject || "General Botanical Inquiry",
       message
     });
+
+    try {
+      await sendContactEmail(created);
+    } catch (emailError) {
+      console.error("Contact inquiry saved but email delivery failed:", emailError.message);
+      return res.status(502).json({
+        error: "Your inquiry was saved, but email delivery is not available right now. Please contact the curatorial team directly."
+      });
+    }
+
     return res.status(201).json({
       success: true,
       message: "Thank you for reaching out. The curatorial team will review your inquiry.",

@@ -60,6 +60,11 @@ const AuthProvider = ({ children }) => {
   const refreshUser = async () => {
     await checkAuth();
   };
+  const updateProfile = async (data) => {
+    const res = await api.updateProfile(data);
+    setUser(res.user);
+    return res;
+  };
   const isAuthenticated = !!user;
   const isAdmin = !!user && user.status === "active";
   const isSuperAdmin = !!user && user.role === "superadmin" && user.status === "active";
@@ -72,7 +77,8 @@ const AuthProvider = ({ children }) => {
       isSuperAdmin,
       login,
       logout,
-      refreshUser
+        refreshUser,
+        updateProfile
     }}
   >
       {children}

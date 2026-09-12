@@ -13,6 +13,16 @@ services:
         value: /var/data
       - key: UPLOADS_DIR
         value: /var/data/uploads
+      - key: GMAIL_USER
+        value: gbherbarium@gmail.com
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: CONTACT_RECIPIENT_EMAIL
+        value: gbherbarium@gmail.com
     disk:
       name: gb-herbarium-data
       mountPath: /var/data

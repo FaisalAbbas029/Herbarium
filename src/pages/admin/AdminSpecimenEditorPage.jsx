@@ -49,6 +49,8 @@ const AdminSpecimenEditorPage = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [duplicateMessage, setDuplicateMessage] = useState(null);
+  const [scientificNameExists, setScientificNameExists] = useState(false);
   const [newPhotoUrl, setNewPhotoUrl] = useState("");
   const [newPhotoCaption, setNewPhotoCaption] = useState("");
   const [filePreviewUrl, setFilePreviewUrl] = useState("");
@@ -68,6 +70,22 @@ const AdminSpecimenEditorPage = ({
       });
     }
   }, [specimenId, isEditing]);
+  useEffect(() => {
+    const scientificName = formData.scientificName?.trim();
+    if (!scientificName || scientificName.length < 3) {
+      setScientificNameExists(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const result = await api.checkScientificNameExists(scientificName, specimenId);
+        setScientificNameExists(result.exists);
+      } catch (err) {
+        console.error("Failed to check scientific name:", err);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [formData.scientificName, specimenId]);
   useEffect(() => () => {
     if (filePreviewUrl.startsWith("blob:")) URL.revokeObjectURL(filePreviewUrl);
   }, [filePreviewUrl]);
@@ -201,8 +219,13 @@ const AdminSpecimenEditorPage = ({
     if (isSubmitting || isUploadingFile) return;
     setErrorMessage(null);
     setSuccessMessage(null);
+    setDuplicateMessage(null);
     if (!formData.accessionNumber?.trim() || !formData.scientificName?.trim() || !formData.family?.trim()) {
       setErrorMessage("Accession Number, Scientific Name, and Family are mandatory.");
+      return;
+    }
+    if (!isEditing && scientificNameExists) {
+      setErrorMessage("This scientific name already exists in the archive. Please enter a different plant name.");
       return;
     }
     setIsSubmitting(true);
@@ -236,7 +259,11 @@ const AdminSpecimenEditorPage = ({
         }
       }
     } catch (err) {
-      setErrorMessage(err.message || "Error occurred while saving specimen record.");
+      if (err.code === "DUPLICATE_SPECIMEN" || err.status === 409) {
+        setDuplicateMessage(err.message);
+      } else {
+        setErrorMessage(err.message || "Error occurred while saving specimen record.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -294,6 +321,25 @@ const AdminSpecimenEditorPage = ({
       <span>{errorMessage}</span>
     </div>}
 
+    {duplicateMessage && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" role="alertdialog" aria-modal="true" aria-labelledby="duplicate-specimen-title">
+      <div className="bg-white border border-[#E0D9CE] rounded-sm max-w-md w-full p-6 shadow-xl">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-sm bg-[#FFF4E5] text-[#A45D25] flex items-center justify-center shrink-0">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <div className="space-y-2">
+            <h2 id="duplicate-specimen-title" className="font-serif-heading text-lg font-bold text-[#1C241E]">Plant Already Exists</h2>
+            <p className="text-sm text-[#566158] leading-relaxed">The plant name you entered already exists in the archive. {duplicateMessage}</p>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end border-t border-[#EDE7DD] pt-4">
+          <button type="button" onClick={() => setDuplicateMessage(null)} className="px-4 py-2 text-sm font-medium text-white bg-[#1F4529] hover:bg-[#15321D] rounded-sm transition-colors">
+            Review Details
+          </button>
+        </div>
+      </div>
+    </div>}
+
     <form onSubmit={(e) => handleSubmit(e)} className="space-y-8">
       {
         /* Section 1: Identification & Taxonomy */
@@ -335,8 +381,11 @@ const AdminSpecimenEditorPage = ({
               value={formData.scientificName || ""}
               onChange={handleInputChange}
               placeholder="e.g. Ginkgo biloba L."
-              className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm font-serif-heading italic text-sm focus:ring-1 focus:ring-[#1F4529]"
+              className={`w-full px-3 py-2 text-xs bg-[#FAF8F5] border rounded-sm font-serif-heading italic text-sm focus:ring-1 focus:ring-[#1F4529] ${scientificNameExists ? "border-[#8F2D14] focus:ring-[#8F2D14]" : "border-[#C7BEB1]"}`}
             />
+            {scientificNameExists && <p className="mt-1 text-xs font-semibold text-[#8F2D14]" role="alert">
+              This plant already exists in the archive. Please change the scientific name before saving.
+            </p>}
           </div>
         </div>
 

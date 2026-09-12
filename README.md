@@ -115,15 +115,22 @@ MySQL, MongoDB, etc.). Its public methods (`findUserByEmail`,
 `createSpecimen`, `createInvitation`, and so on) can stay the same, so
 `server.js` and the React frontend would not need to change.
 
-## Where to Connect a Real Email Provider
+## Contact Email Delivery
 
-Two places currently generate content that would be emailed in
-production, but only save it to the database for now:
-- `POST /api/team/invite` in `server.js` (admin invitations)
-- `POST /api/contact` in `server.js` (contact inquiries)
+Contact inquiries are saved to the database and sent to the admin inbox.
+For a Gmail recipient, enable 2-Step Verification on the Gmail account,
+create a Google App Password, then set:
 
-Both are marked with `EMAIL SENDING` comments in the code showing exactly
-where to call a provider such as Resend, SendGrid, or Amazon SES.
+```bash
+GMAIL_USER=gbherbarium@gmail.com
+GMAIL_APP_PASSWORD=your_16_character_google_app_password
+CONTACT_RECIPIENT_EMAIL=gbherbarium@gmail.com
+```
+
+The app sends through Gmail SMTP and sets the visitor's address as Reply-To.
+Resend remains supported as a fallback for deployments with a verified
+sender domain. On Render, configure these values in the service's
+Environment settings.
 
 ---
 
@@ -140,9 +147,12 @@ Then open **http://localhost:3000**
 
 Demo admin login (seeded automatically on first run):
 ```
-Email:    curator@gb-herbarium.org
-Password: Botanist2026!
+Email:    faisalabbas@gmail.com
+Password: Faisal@123
 ```
+
+Open `/admin/login` to sign in. New admin accounts can only be created by a
+superadministrator through an invitation link.
 
 ### Other scripts
 ```bash
@@ -152,8 +162,8 @@ npm run start      # Run in production mode (serves the built /dist folder)
 
 ## Known Limitations
 
-- No real outbound email — invitations and contact replies must be
-  shared/handled manually (see "Where to Connect a Real Email Provider").
+- Admin invitations still need to be handled manually; contact inquiries
+  are delivered through Resend when the email variables are configured.
 - Data is stored in a single JSON file rather than a real database —
   fine for demo/small-team use, not for high concurrent write volume.
 - Login sessions are kept in memory, so they are cleared if the server

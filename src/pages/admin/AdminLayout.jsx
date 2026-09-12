@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Layers,
@@ -11,7 +11,10 @@ import {
   Leaf,
   ChevronRight,
   Menu,
-  X
+  X,
+  UserRound,
+  Moon,
+  Sun
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 const AdminLayout = ({
@@ -21,6 +24,10 @@ const AdminLayout = ({
 }) => {
   const { user, logout, isSuperAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("gb_herbarium_admin_theme") === "dark");
+  useEffect(() => {
+    localStorage.setItem("gb_herbarium_admin_theme", isDarkMode ? "dark" : "light");
+  }, [isDarkMode]);
   const navItems = [
     { id: "dashboard", label: "Overview", path: "/admin", icon: LayoutDashboard },
     { id: "specimens", label: "Specimen Catalog", path: "/admin/specimens", icon: Layers },
@@ -32,7 +39,7 @@ const AdminLayout = ({
     onNavigate(path);
     setMobileMenuOpen(false);
   };
-  return <div className="h-screen w-full bg-[#F7F5F0] flex flex-col md:flex-row text-[#1C241E] overflow-hidden">
+  return <div className={`admin-theme h-screen w-full bg-[#F7F5F0] flex flex-col md:flex-row text-[#1C241E] overflow-hidden ${isDarkMode ? "dark" : "light"}`}>
       {
     /* Mobile Top Navigation Bar */
   }
@@ -47,6 +54,14 @@ const AdminLayout = ({
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsDarkMode((current) => !current)}
+            className="p-1.5 text-[#D8E6DC] hover:text-white rounded-xs"
+            title={isDarkMode ? "Switch admin to light mode" : "Switch admin to dark mode"}
+            aria-label={isDarkMode ? "Switch admin to light mode" : "Switch admin to dark mode"}
+          >
+            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
           <button
             onClick={() => handleNavItemClick("/admin/specimens/new")}
             className="p-1.5 bg-[#2D5A3D] text-white rounded-xs"
@@ -127,22 +142,19 @@ const AdminLayout = ({
 
           {/* User Profile Card */}
           <div className="p-4 bg-[#141F18] border-b border-[#2D3F33]">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#2D5A3D] text-white text-xs font-bold flex items-center justify-center font-mono-acc shrink-0">
-                {user?.name?.charAt(0) || "A"}
+            <button onClick={() => handleNavItemClick("/admin/profile")} className="w-full flex items-center gap-3 text-left hover:bg-[#233529] rounded-sm p-1 -m-1 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-[#2D5A3D] text-white text-xs font-bold flex items-center justify-center font-mono-acc shrink-0 overflow-hidden">
+                {user?.avatarUrl ? <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" /> : user?.name?.charAt(0) || "A"}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span
-                    className={`inline-block w-1.5 h-1.5 rounded-full ${user?.role === "superadmin" ? "bg-[#5A9E72]" : "bg-[#E3D8C8]"}`}
-                  />
-                  <span className="text-[10px] uppercase font-mono-acc tracking-wider text-[#A4B3A8]">
-                    {user?.role === "curator" ? "ADMIN" : user?.role || "ADMIN"}
-                  </span>
+                  <span className={`inline-block w-1.5 h-1.5 rounded-full ${user?.role === "superadmin" ? "bg-[#5A9E72]" : "bg-[#E3D8C8]"}`} />
+                  <span className="text-[10px] uppercase font-mono-acc tracking-wider text-[#A4B3A8]">{user?.role === "curator" ? "ADMIN" : user?.role || "ADMIN"}</span>
                 </div>
               </div>
-            </div>
+              <UserRound className="w-3.5 h-3.5 text-[#8A9B8F]" />
+            </button>
           </div>
         </div>
 
@@ -164,6 +176,13 @@ const AdminLayout = ({
               {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#A4B3A8] shrink-0" />}
             </button>;
           })}
+          <button
+            onClick={() => handleNavItemClick("/admin/profile")}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-sm text-xs font-medium transition-colors ${currentAdminTab === "profile" ? "bg-[#2D5A3D] text-white shadow-xs font-semibold" : "text-[#B8C8BD] hover:bg-[#233529] hover:text-white"}`}
+          >
+            <div className="flex items-center gap-2.5"><UserRound className="w-4 h-4 shrink-0 text-[#D8E6DC]" /><span className="truncate">My Profile</span></div>
+            {currentAdminTab === "profile" && <ChevronRight className="w-3.5 h-3.5 text-[#A4B3A8] shrink-0" />}
+          </button>
         </nav>
 
         {/* Dedicated Fixed Bottom Section (Public Archive & Sign Out always visible) */}
@@ -205,6 +224,14 @@ const AdminLayout = ({
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsDarkMode((current) => !current)}
+              className="p-2 text-[#566158] hover:text-[#1F4529] hover:bg-[#F3EFEA] rounded-sm transition-colors"
+              title={isDarkMode ? "Switch admin to light mode" : "Switch admin to dark mode"}
+              aria-label={isDarkMode ? "Switch admin to light mode" : "Switch admin to dark mode"}
+            >
+              {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             <button
               onClick={() => onNavigate("/admin/specimens/new")}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors shadow-xs"

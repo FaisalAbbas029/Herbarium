@@ -24,6 +24,79 @@
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  .public-theme.dark,
+  .admin-theme.dark {
+    background-color: #17221B;
+    color: #E6EEE8;
+  }
+
+  .admin-theme.dark[class*="bg-[#F7F5F0]"] {
+    background-color: #17221B !important;
+  }
+
+  .public-theme.dark [class*="bg-[#FAF8F5]"],
+  .public-theme.dark [class*="bg-white"],
+  .admin-theme.dark [class*="bg-[#FAF8F5]"],
+  .admin-theme.dark [class*="bg-white"] {
+    background-color: #202D24 !important;
+  }
+
+  .public-theme.dark [class*="bg-[#F3EFEA]"],
+  .public-theme.dark [class*="bg-[#EAE5DE]"],
+  .admin-theme.dark [class*="bg-[#F3EFEA]"],
+  .admin-theme.dark [class*="bg-[#EAE5DE]"] {
+    background-color: #29382E !important;
+  }
+
+  .public-theme.dark [class*="border-[#E0D9CE]"],
+  .public-theme.dark [class*="border-[#EDE7DD]"],
+  .public-theme.dark [class*="border-[#C7BEB1]"],
+  .admin-theme.dark [class*="border-[#E0D9CE]"],
+  .admin-theme.dark [class*="border-[#EDE7DD]"],
+  .admin-theme.dark [class*="border-[#C7BEB1]"] {
+    border-color: #405146 !important;
+  }
+
+  .public-theme.dark [class*="text-[#1C241E]"],
+  .public-theme.dark [class*="text-[#4A554D]"],
+  .public-theme.dark [class*="text-[#566158]"],
+  .public-theme.dark [class*="text-[#6E7570]"],
+  .public-theme.dark [class*="text-[#7E8C81]"],
+  .admin-theme.dark [class*="text-[#1C241E]"],
+  .admin-theme.dark [class*="text-[#4A554D]"],
+  .admin-theme.dark [class*="text-[#566158]"],
+  .admin-theme.dark [class*="text-[#6E7570]"],
+  .admin-theme.dark [class*="text-[#7E8C81]"] {
+    color: #D0DDD3 !important;
+  }
+
+  .public-theme.dark [class*="text-[#1F4529]"],
+  .admin-theme.dark [class*="text-[#1F4529]"] {
+    color: #A8D0B3 !important;
+  }
+
+  .public-theme.dark input,
+  .public-theme.dark textarea,
+  .public-theme.dark select,
+  .admin-theme.dark input,
+  .admin-theme.dark textarea,
+  .admin-theme.dark select {
+    background-color: #26352B !important;
+    color: #E6EEE8 !important;
+    border-color: #526558 !important;
+  }
+
+  .public-theme.dark ::placeholder,
+  .admin-theme.dark ::placeholder {
+    color: #91A497 !important;
+  }
+
+  .public-theme.dark .specimen-paper,
+  .admin-theme.dark .specimen-paper {
+    background-color: #202D24;
+    background-image: radial-gradient(#405146 0.75px, transparent 0.75px);
+  }
+
   h1, h2, h3, .font-serif-heading {
     font-family: 'Lora', Georgia, Cambria, serif;
   }

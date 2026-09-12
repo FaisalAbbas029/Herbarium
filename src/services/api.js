@@ -85,7 +85,10 @@ async function request(url, options = {}) {
         statusText: response.statusText,
         responseBody: data
       });
-      throw new Error(data?.error || `Request failed with ${response.status} ${response.statusText}.`);
+      const error = new Error(data?.error || `Request failed with ${response.status} ${response.statusText}.`);
+      error.status = response.status;
+      error.code = data?.code;
+      throw error;
     }
 
     return data;
@@ -117,6 +120,12 @@ const api = {
     } finally {
       localStorage.removeItem("gb_herbarium_token");
     }
+  },
+  async updateProfile(data) {
+    return request("/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(data)
+    });
   },
   // Team management (superadmin only)
   async getTeam() {
@@ -184,6 +193,10 @@ const api = {
   async checkAccessionExists(accession, excludeId) {
     const query = excludeId ? `?excludeId=${encodeURIComponent(excludeId)}` : "";
     return request(`/specimens/check-accession/${encodeURIComponent(accession)}${query}`);
+  },
+  async checkScientificNameExists(scientificName, excludeId) {
+    const query = excludeId ? `?excludeId=${encodeURIComponent(excludeId)}` : "";
+    return request(`/specimens/check-scientific-name/${encodeURIComponent(scientificName)}${query}`);
   },
   async createSpecimen(data) {
     return request("/specimens", {
