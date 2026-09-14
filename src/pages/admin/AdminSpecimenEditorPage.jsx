@@ -15,6 +15,7 @@ import {
 import { api } from "../../services/api.js";
 import { SpecimenImage } from "../../components/common/SpecimenImage.jsx";
 import { SpecimenMapView } from "../../components/common/SpecimenMapView.jsx";
+import { ValidationErrorModal } from "../../components/common/ValidationErrorModal.jsx";
 const AdminSpecimenEditorPage = ({
   specimenId,
   onNavigate
@@ -60,10 +61,49 @@ const AdminSpecimenEditorPage = ({
   const [newPhotoUrl, setNewPhotoUrl] = useState("");
   const [newPhotoCaption, setNewPhotoCaption] = useState("");
   const [filePreviewUrl, setFilePreviewUrl] = useState("");
-  // Tracks whether a local file is currently being sent to the server, so
-  // we can show an "Uploading..." state and disable the Attach button
-  // until the real specimen path (storageUrl) comes back.
   const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [validationModal, setValidationModal] = useState({
+    isOpen: false,
+    title: "Unable to Submit Specimen",
+    message: "",
+    errors: [],
+    targetFieldId: null
+  });
+
+  const showValidationModal = ({ title, message, errors, targetFieldId }) => {
+    setValidationModal({
+      isOpen: true,
+      title: title || (targetFieldId === "section-photos" ? "Unable to Publish Specimen" : "Unable to Submit Specimen"),
+      message: message !== undefined ? message : (Array.isArray(errors) && errors.length > 1 ? "Please fix the following issues:" : ""),
+      errors: Array.isArray(errors) ? errors : [errors],
+      targetFieldId: targetFieldId || null
+    });
+  };
+
+  const handleValidationModalClose = () => {
+    const targetId = validationModal.targetFieldId;
+    setValidationModal((prev) => ({ ...prev, isOpen: false }));
+    if (!targetId) return;
+
+    setTimeout(() => {
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.classList.remove("error-field-highlight");
+        void element.offsetWidth;
+        element.classList.add("error-field-highlight");
+        if (["INPUT", "SELECT", "TEXTAREA"].includes(element.tagName)) {
+          element.focus();
+        } else {
+          const focusable = element.querySelector("input, button, select, textarea");
+          focusable?.focus();
+        }
+        setTimeout(() => {
+          element.classList.remove("error-field-highlight");
+        }, 3000);
+      }
+    }, 120);
+  };
   useEffect(() => {
     if (isEditing && specimenId) {
       setIsLoading(true);
@@ -198,8 +238,13 @@ const AdminSpecimenEditorPage = ({
     try {
       await validateImageFile(file);
     } catch (err) {
-      setErrorMessage(err.message);
       e.target.value = "";
+      showValidationModal({
+        title: "Invalid Photograph File",
+        message: "The chosen image could not be uploaded:",
+        errors: [err.message],
+        targetFieldId: "photo-upload-zone"
+      });
       return;
     }
     setErrorMessage(null);
@@ -210,30 +255,83 @@ const AdminSpecimenEditorPage = ({
     setIsUploadingFile(true);
     try {
       const result = await api.uploadPhotoFile(file);
-      // result.url is the specimen path returned by the server, e.g.
-      // "/uploads/specimen-1699999999999-a1b2c3.jpg"
       setNewPhotoUrl(result.url);
     } catch (err) {
-      setErrorMessage(err.message || "Failed to upload image. Please try again.");
+      showValidationModal({
+        title: "Photograph Upload Failed",
+        message: "The server was unable to store the selected photograph:",
+        errors: [err.message || "Failed to upload image. Please try again."],
+        targetFieldId: "photo-upload-zone"
+      });
     } finally {
       setIsUploadingFile(false);
       e.target.value = "";
     }
   };
+
   const handleSubmit = async (e, forceStatus) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (isSubmitting || isUploadingFile) return;
     setErrorMessage(null);
     setSuccessMessage(null);
     setDuplicateMessage(null);
-    if (!formData.accessionNumber?.trim() || !formData.scientificName?.trim() || !formData.family?.trim()) {
-      setErrorMessage("Accession Number, Scientific Name, and Family are mandatory.");
-      return;
+
+    const targetStatus = forceStatus || formData.status || "PUBLISHED";
+    const validationErrors = [];
+    let firstTargetField = null;
+
+    if (!formData.accessionNumber?.trim()) {
+      validationErrors.push("Accession Number is required (e.g. SHB-2024-001).");
+      if (!firstTargetField) firstTargetField = "field-accessionNumber";
     }
+
+    if (!formData.scientificName?.trim()) {
+      validationErrors.push("Scientific Name (Binomen) is required.");
+      if (!firstTargetField) firstTargetField = "field-scientificName";
+    } else if (formData.scientificName.trim().split(/\s+/).length < 2) {
+      validationErrors.push("Scientific Name must include both Genus and Species epithet (e.g. Ginkgo biloba).");
+      if (!firstTargetField) firstTargetField = "field-scientificName";
+    }
+
+    if (!formData.family?.trim()) {
+      validationErrors.push("Botanical Family is required (e.g. Ginkgoaceae).");
+      if (!firstTargetField) firstTargetField = "field-family";
+    }
+
     if (!isEditing && scientificNameExists) {
-      setErrorMessage("This scientific name already exists in the archive. Please enter a different plant name.");
+      validationErrors.push("This scientific name already exists in the archive. Please enter a different plant name.");
+      if (!firstTargetField) firstTargetField = "field-scientificName";
+    }
+
+    if (targetStatus === "PUBLISHED") {
+      if (!formData.photos || formData.photos.length === 0) {
+        validationErrors.push("At least one specimen photograph is required before publishing.");
+        if (!firstTargetField) firstTargetField = "section-photos";
+      }
+    }
+
+    if (formData.photos && formData.photos.length > 5) {
+      validationErrors.push("You can upload a maximum of 5 photographs per voucher record.");
+      if (!firstTargetField) firstTargetField = "section-photos";
+    }
+
+    if (validationErrors.length > 0) {
+      const isPublish = targetStatus === "PUBLISHED";
+      const onlyPhotoError = validationErrors.length === 1 && firstTargetField === "section-photos";
+
+      showValidationModal({
+        title: isPublish && onlyPhotoError ? "Unable to Publish Specimen" : isPublish ? "Unable to Publish Specimen" : "Unable to Submit Specimen",
+        message: onlyPhotoError
+          ? "A visual photographic voucher is required for peer verification before publishing."
+          : validationErrors.length > 1
+            ? "Please fix the following issues:"
+            : "Please fix the issue below:",
+        errors: validationErrors,
+        targetFieldId: firstTargetField
+      });
       return;
     }
+
     setIsSubmitting(true);
     try {
       const payload = {
@@ -241,7 +339,7 @@ const AdminSpecimenEditorPage = ({
         latitude: formData.latitude !== "" && formData.latitude !== null && !isNaN(Number(formData.latitude)) ? Number(formData.latitude) : (formData.latitude || null),
         longitude: formData.longitude !== "" && formData.longitude !== null && !isNaN(Number(formData.longitude)) ? Number(formData.longitude) : (formData.longitude || null),
         elevation: formData.elevation?.trim() || null,
-        status: forceStatus || formData.status || "PUBLISHED"
+        status: targetStatus
       };
       if (isEditing && specimenId) {
         const updated = await api.updateSpecimen(specimenId, payload);
@@ -268,11 +366,48 @@ const AdminSpecimenEditorPage = ({
         }
       }
     } catch (err) {
+      console.error("Specimen submit error:", err);
+      let errorTitle = targetStatus === "PUBLISHED" ? "Unable to Publish Specimen" : "Unable to Submit Specimen";
+      let userMessage = "An error occurred while saving the specimen record.";
+      let targetId = null;
+
       if (err.code === "DUPLICATE_SPECIMEN" || err.status === 409) {
-        setDuplicateMessage(err.message);
+        errorTitle = "Plant Already Exists";
+        userMessage = err.message || "A specimen with this scientific name or accession number already exists in the archive.";
+        targetId = "field-scientificName";
+      } else if (err.status === 400 || (err.message && /photograph/i.test(err.message))) {
+        if (/photograph/i.test(err.message)) {
+          errorTitle = "Unable to Publish Specimen";
+          userMessage = err.message || "At least 1 specimen photograph is required before publishing.";
+          targetId = "section-photos";
+        } else if (/accession/i.test(err.message)) {
+          userMessage = err.message;
+          targetId = "field-accessionNumber";
+        } else if (/scientific|genus|species/i.test(err.message)) {
+          userMessage = err.message;
+          targetId = "field-scientificName";
+        } else if (/family/i.test(err.message)) {
+          userMessage = err.message;
+          targetId = "field-family";
+        } else {
+          userMessage = err.message;
+        }
+      } else if (err.status === 401 || err.status === 403) {
+        errorTitle = "Authentication Required";
+        userMessage = "Your curator session has expired or you do not have permission to perform this action. Please log in again.";
+      } else if (err.name === "TypeError" && /fetch|network/i.test(err.message)) {
+        errorTitle = "Network Connection Error";
+        userMessage = "Unable to connect to the Herbarium archive server. Please verify your internet connection and try again.";
       } else {
-        setErrorMessage(err.message || "Error occurred while saving specimen record.");
+        userMessage = err.message || "An unexpected error occurred while saving the specimen record. Please try again.";
       }
+
+      showValidationModal({
+        title: errorTitle,
+        message: "",
+        errors: [userMessage],
+        targetFieldId: targetId
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -317,39 +452,12 @@ const AdminSpecimenEditorPage = ({
       </div>
     </div>
 
-    {
-      /* Messages */
-    }
     {successMessage && <div className="p-4 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] rounded-sm flex items-center gap-2.5 text-xs">
       <FontAwesomeIcon icon={faCircleCheck} className="w-4 h-4 text-[#2D5A3D] shrink-0" />
       <span className="font-semibold">{successMessage}</span>
     </div>}
 
-    {errorMessage && <div className="p-4 bg-[#FDF2F2] border border-[#F5C6C6] text-[#8F2D14] rounded-sm flex items-center gap-2.5 text-xs">
-      <FontAwesomeIcon icon={faCircleExclamation} className="w-4 h-4 shrink-0" />
-      <span>{errorMessage}</span>
-    </div>}
-
-    {duplicateMessage && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" role="alertdialog" aria-modal="true" aria-labelledby="duplicate-specimen-title">
-      <div className="bg-white border border-[#E0D9CE] rounded-sm max-w-md w-full p-6 shadow-xl">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-sm bg-[#FFF4E5] text-[#A45D25] flex items-center justify-center shrink-0">
-            <AlertCircle className="w-5 h-5" />
-          </div>
-          <div className="space-y-2">
-            <h2 id="duplicate-specimen-title" className="font-serif-heading text-lg font-bold text-[#1C241E]">Plant Already Exists</h2>
-            <p className="text-sm text-[#566158] leading-relaxed">The plant name you entered already exists in the archive. {duplicateMessage}</p>
-          </div>
-        </div>
-        <div className="mt-6 flex justify-end border-t border-[#EDE7DD] pt-4">
-          <button type="button" onClick={() => setDuplicateMessage(null)} className="px-4 py-2 text-sm font-medium text-white bg-[#1F4529] hover:bg-[#15321D] rounded-sm transition-colors">
-            Review Details
-          </button>
-        </div>
-      </div>
-    </div>}
-
-    <form onSubmit={(e) => handleSubmit(e)} className="space-y-8">
+    <form onSubmit={(e) => handleSubmit(e)} noValidate className="space-y-8">
       {
         /* Section 1: Identification & Taxonomy */
       }
@@ -365,10 +473,11 @@ const AdminSpecimenEditorPage = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            <label htmlFor="field-accessionNumber" className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
               Accession Number <span className="text-[#8F2D14]">*</span>
             </label>
             <input
+              id="field-accessionNumber"
               type="text"
               required
               name="accessionNumber"
@@ -380,10 +489,11 @@ const AdminSpecimenEditorPage = ({
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            <label htmlFor="field-scientificName" className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
               Scientific Name (Binomen) <span className="text-[#8F2D14]">*</span>
             </label>
             <input
+              id="field-scientificName"
               type="text"
               required
               name="scientificName"
@@ -400,10 +510,11 @@ const AdminSpecimenEditorPage = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            <label htmlFor="field-family" className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
               Botanical Family <span className="text-[#8F2D14]">*</span>
             </label>
             <input
+              id="field-family"
               type="text"
               required
               name="family"
@@ -415,10 +526,11 @@ const AdminSpecimenEditorPage = ({
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            <label htmlFor="field-commonName" className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
               Vernacular / Common Name
             </label>
             <input
+              id="field-commonName"
               type="text"
               name="commonName"
               value={formData.commonName || ""}
@@ -511,10 +623,11 @@ const AdminSpecimenEditorPage = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            <label htmlFor="field-collectorName" className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
               Collector Name(s)
             </label>
             <input
+              id="field-collectorName"
               type="text"
               name="collectorName"
               value={formData.collectorName || ""}
@@ -525,10 +638,11 @@ const AdminSpecimenEditorPage = ({
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
+            <label htmlFor="field-collectionDate" className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
               Collection Date
             </label>
             <input
+              id="field-collectionDate"
               type="date"
               name="collectionDate"
               value={formData.collectionDate ? formData.collectionDate.slice(0, 10) : ""}
@@ -672,7 +786,7 @@ const AdminSpecimenEditorPage = ({
       {
         /* Section 3: High-Resolution Photographic Documentation */
       }
-      <div className="bg-white border border-[#E0D9CE] rounded-sm p-6 sm:p-8 space-y-6">
+      <div id="section-photos" className="bg-white border border-[#E0D9CE] rounded-sm p-6 sm:p-8 space-y-6 transition-all duration-300">
         <div className="border-b border-[#EDE7DD] pb-3 flex items-center justify-between">
           <div>
             <h2 className="font-serif-heading text-lg font-bold text-[#1C241E] flex items-center gap-2">
@@ -740,7 +854,7 @@ const AdminSpecimenEditorPage = ({
         {
           /* Add New Photograph Subform */
         }
-        <div className="bg-[#FAF8F5] border border-[#E0D9CE] rounded-sm p-4 space-y-4">
+        <div id="photo-upload-zone" className="bg-[#FAF8F5] border border-[#E0D9CE] rounded-sm p-4 space-y-4 transition-all duration-300">
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#1C241E]">
             Add Photo / Micrograph Voucher
           </h3>
@@ -968,6 +1082,14 @@ const AdminSpecimenEditorPage = ({
         </button>
       </div>
     </form>
+
+    <ValidationErrorModal
+      isOpen={validationModal.isOpen}
+      title={validationModal.title}
+      message={validationModal.message}
+      errors={validationModal.errors}
+      onClose={handleValidationModalClose}
+    />
   </div>;
 };
 export {

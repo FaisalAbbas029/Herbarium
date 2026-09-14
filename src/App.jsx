@@ -15,6 +15,7 @@ import { AdminLayout } from "./pages/admin/AdminLayout.jsx";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage.jsx";
 import { AdminSpecimensListPage } from "./pages/admin/AdminSpecimensListPage.jsx";
 import { AdminSpecimenEditorPage } from "./pages/admin/AdminSpecimenEditorPage.jsx";
+import { AdminProfilePage } from "./pages/admin/AdminProfilePage.jsx";
 import { AdminTeamPage } from "./pages/admin/AdminTeamPage.jsx";
 import { AdminAuditLogsPage } from "./pages/admin/AdminAuditLogsPage.jsx";
 function parseSearchParams(search) {
@@ -35,7 +36,21 @@ function AppContent() {
   const [currentPath, setCurrentPath] = useState(
     window.location.pathname + window.location.search
   );
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("gb_herbarium_public_theme") ?? localStorage.getItem("gb_herbarium_theme");
+    return saved === "dark";
+  });
   const { isAuthenticated, isLoading } = useAuth();
+  useEffect(() => {
+    localStorage.setItem("gb_herbarium_public_theme", isDarkMode ? "dark" : "light");
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
+    }
+  }, [isDarkMode]);
   useEffect(() => {
     const handlePopState = () => {
       setCurrentPath(window.location.pathname + window.location.search);
@@ -51,11 +66,11 @@ function AppContent() {
   const pathname = currentPath.split("?")[0];
   if (isLoading) {
     return <div className="min-h-screen bg-[#FAF8F5] flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 border-3 border-[#1F4529] border-t-transparent rounded-full animate-spin" />
-        <div className="font-serif-heading text-sm text-[#1F4529] font-bold tracking-wider uppercase">
-          Gilgit-Baltistan Herbarium Archive
-        </div>
-      </div>;
+      <div className="w-10 h-10 border-3 border-[#1F4529] border-t-transparent rounded-full animate-spin" />
+      <div className="font-serif-heading text-sm text-[#1F4529] font-bold tracking-wider uppercase">
+        Gilgit-Baltistan Herbarium Archive
+      </div>
+    </div>;
   }
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") {
@@ -76,17 +91,19 @@ function AppContent() {
       currentAdminTab = "new-specimen";
     } else if (pathname.startsWith("/admin/specimens")) {
       currentAdminTab = "specimens";
+    } else if (pathname === "/admin/profile") {
+      currentAdminTab = "profile";
     } else if (pathname.startsWith("/admin/team")) {
       currentAdminTab = "team";
     } else if (pathname.startsWith("/admin/audit-logs")) {
       currentAdminTab = "audit-logs";
     }
     return <AdminLayout currentAdminTab={currentAdminTab} onNavigate={handleNavigate}>
-        {pathname === "/admin" || pathname === "/admin/dashboard" ? <AdminDashboardPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens" ? <AdminSpecimensListPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens/new" ? <AdminSpecimenEditorPage onNavigate={handleNavigate} /> : pathname.startsWith("/admin/specimens/edit/") ? <AdminSpecimenEditorPage
-      specimenId={pathname.replace("/admin/specimens/edit/", "")}
-      onNavigate={handleNavigate}
-    /> : pathname === "/admin/team" ? <AdminTeamPage onNavigate={handleNavigate} /> : pathname === "/admin/audit-logs" ? <AdminAuditLogsPage onNavigate={handleNavigate} /> : <AdminDashboardPage onNavigate={handleNavigate} />}
-      </AdminLayout>;
+      {pathname === "/admin" || pathname === "/admin/dashboard" ? <AdminDashboardPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens" ? <AdminSpecimensListPage onNavigate={handleNavigate} /> : pathname === "/admin/specimens/new" ? <AdminSpecimenEditorPage onNavigate={handleNavigate} /> : pathname.startsWith("/admin/specimens/edit/") ? <AdminSpecimenEditorPage
+        specimenId={pathname.replace("/admin/specimens/edit/", "")}
+        onNavigate={handleNavigate}
+      /> : pathname === "/admin/profile" ? <AdminProfilePage /> : pathname === "/admin/team" ? <AdminTeamPage onNavigate={handleNavigate} /> : pathname === "/admin/audit-logs" ? <AdminAuditLogsPage onNavigate={handleNavigate} /> : <AdminDashboardPage onNavigate={handleNavigate} />}
+    </AdminLayout>;
   }
   let publicPage = null;
   if (pathname === "/" || pathname === "/home") {
@@ -104,24 +121,30 @@ function AppContent() {
   } else if (pathname === "/contact") {
     publicPage = <ContactPage onNavigate={handleNavigate} />;
   } else if (pathname === "/accept-invitation") {
-    publicPage = <AcceptInvitationPage onNavigate={handleNavigate} />;
+    const invitationToken = new URLSearchParams(currentPath.split("?")[1] || "").get("token");
+    publicPage = <AcceptInvitationPage token={invitationToken} onNavigate={handleNavigate} />;
   } else {
     publicPage = <NotFoundPage onNavigate={handleNavigate} />;
   }
-  return <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1C241E]">
-      <Navbar currentPath={pathname} onNavigate={handleNavigate} />
-      <main className="flex-1">
-        <div key={pathname} className="animate-page-enter">
-          {publicPage}
-        </div>
-      </main>
-      <Footer onNavigate={handleNavigate} />
-    </div>;
+  return <div className={`public-theme min-h-screen flex flex-col ${isDarkMode ? "dark bg-[#17221B] text-[#E6EEE8]" : "light bg-[#FAF8F5] text-[#1C241E]"}`}>
+    <Navbar
+      currentPath={pathname}
+      onNavigate={handleNavigate}
+      isDarkMode={isDarkMode}
+      onToggleTheme={() => setIsDarkMode((current) => !current)}
+    />
+    <main className="flex-1">
+      <div key={pathname} className="animate-page-enter">
+        {publicPage}
+      </div>
+    </main>
+    <Footer onNavigate={handleNavigate} />
+  </div>;
 }
 function App() {
   return <AuthProvider>
-      <AppContent />
-    </AuthProvider>;
+    <AppContent />
+  </AuthProvider>;
 }
 export {
   App as default

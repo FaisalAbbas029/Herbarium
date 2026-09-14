@@ -858,7 +858,7 @@ class HerbariumDatabase {
   // invitee opens the invite link and sets a password (see
   // acceptInvitation() below). Invitations automatically expire after 7
   // days if never accepted.
-  createInvitation(email, name, role, inviter) {
+  createInvitation(email, name, role, inviter, extra = {}) {
     const token = crypto.randomBytes(32).toString("hex");
     const invitation = {
       id: `inv-${crypto.randomUUID().slice(0, 8)}`,
@@ -869,13 +869,34 @@ class HerbariumDatabase {
       invitedByUserName: inviter.name,
       token,
       status: "pending",
+      emailDeliveryStatus: extra.emailDeliveryStatus || "pending",
       createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+      lastInvitedAt: (/* @__PURE__ */ new Date()).toISOString(),
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1e3).toISOString()
       // 7 days
     };
     this.data.adminInvitations.push(invitation);
     this.persist();
     return invitation;
+  }
+  findInvitationById(id) {
+    return this.data.adminInvitations.find((i) => i.id === id);
+  }
+  findPendingInvitationByEmail(email) {
+    const normalized = String(email || "").toLowerCase().trim();
+    return this.data.adminInvitations.find(
+      (i) => i.email.toLowerCase() === normalized && i.status === "pending" && new Date(i.expiresAt) > /* @__PURE__ */ new Date()
+    );
+  }
+  updateInvitationEmailStatus(invitationId, emailStatus) {
+    const inv = this.data.adminInvitations.find((i) => i.id === invitationId);
+    if (inv) {
+      inv.emailDeliveryStatus = emailStatus;
+      inv.lastInvitedAt = (/* @__PURE__ */ new Date()).toISOString();
+      this.persist();
+      return inv;
+    }
+    return null;
   }
   getInvitations() {
     return this.data.adminInvitations;

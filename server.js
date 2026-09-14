@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import cors from "cors";
 import { db } from "./server/db.js";
-import { sendContactEmail } from "./server/mail.js";
+import { sendContactEmail, sendAdminInvitationEmail } from "./server/mail.js";
 import {
   authManager,
   optionalAuthMiddleware,
@@ -253,18 +253,64 @@ app.get("/api/team", requireAuthMiddleware, (req, res) => {
 // production; for now it is returned directly to the admin so it can be
 // shared manually. See the EMAIL SENDING note further down for how to wire
 // up a real email provider.
-app.post("/api/team/invite", requireSuperAdminMiddleware, (req, res) => {
+app.post("/api/team/invite", requireSuperAdminMiddleware, async (req, res) => {
   try {
-    const { email, name, role } = req.body;
-    if (!email || !name) {
-      return res.status(400).json({ error: "Colleague email and name are required." });
+    const rawName = req.body?.name;
+    const rawEmail = req.body?.email;
+    const name = typeof rawName === "string" ? rawName.trim() : "";
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+
+    if (!name) {
+      return res.status(400).json({ error: "Name is required." });
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({ error: "Please enter a valid email address." });
+    }
+
+    console.log(`[TEAM] Creating invitation for: ${email}`);
+
     const existingUser = db.findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ error: "An administrator account already exists with this email address." });
+      return res.status(409).json({ error: "This email is already registered." });
     }
-    const validRole = role === "superadmin" ? "superadmin" : "curator";
-    const invitation = db.createInvitation(email, name, validRole, req.user);
+
+    // Role selection: Super Admin can choose "superadmin" or "curator" (normal Admin)
+    const rawRole = String(req.body?.role || "").trim().toLowerCase();
+    const validRole = rawRole === "superadmin" ? "superadmin" : "curator";
+
+    const frontendBaseUrl = (
+      process.env.APP_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://herbariumgb.netlify.app"
+        : "http://localhost:3000")
+    ).trim().replace(/\/+$/, "");
+
+    const invitation = db.createInvitation(email, name, validRole, req.user, {
+      emailDeliveryStatus: "pending"
+    });
+    const inviteUrl = `${frontendBaseUrl}/accept-invitation?token=${invitation.token}`;
+
+    let emailSent = false;
+    let emailErrorMessage = null;
+
+    try {
+      await sendAdminInvitationEmail({
+        name,
+        email,
+        role: validRole,
+        inviteUrl,
+        frontendUrl: frontendBaseUrl
+      });
+      emailSent = true;
+      db.updateInvitationEmailStatus(invitation.id, "sent");
+    } catch (mailErr) {
+      emailErrorMessage = mailErr.message;
+      console.error("Admin invitation email delivery failed:", mailErr.message);
+      db.updateInvitationEmailStatus(invitation.id, "failed");
+    }
+
     db.logActivity({
       userId: req.user.id,
       userName: req.user.name,
@@ -276,13 +322,27 @@ app.post("/api/team/invite", requireSuperAdminMiddleware, (req, res) => {
       fieldChanged: "team_invitation",
       previousValue: null,
       newValue: email,
-      notes: `Issued admin invitation to ${name} (${email}) as ${validRole}`
+      notes: `Issued admin invitation to ${name} (${email}) as ${validRole}. Email delivery: ${emailSent ? "sent" : "failed"}`
     });
-    return res.status(201).json({
-      invitation,
-      inviteLink: `/admin/accept-invitation?token=${invitation.token}`,
-      message: `Invitation generated successfully for ${email}.`
-    });
+
+    if (emailSent) {
+      return res.status(201).json({
+        success: true,
+        emailSent: true,
+        invitation,
+        inviteLink: inviteUrl,
+        message: "Admin created and invitation email sent."
+      });
+    } else {
+      return res.status(201).json({
+        success: true,
+        emailSent: false,
+        invitation,
+        inviteLink: inviteUrl,
+        emailError: emailErrorMessage,
+        message: "Admin account created, but the invitation email could not be sent."
+      });
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -436,6 +496,58 @@ app.delete("/api/team/invitations/:id/revoke", requireSuperAdminMiddleware, (req
     const { id } = req.params;
     db.revokeInvitation(id);
     return res.json({ success: true, message: "Invitation revoked." });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+app.post("/api/team/invitations/:id/resend", requireSuperAdminMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const invitation = db.findInvitationById(id);
+    if (!invitation) {
+      return res.status(404).json({ error: "Staff invitation not found." });
+    }
+    if (invitation.status !== "pending") {
+      return res.status(400).json({ error: `Cannot resend invitation with status '${invitation.status}'.` });
+    }
+    const existingUser = db.findUserByEmail(invitation.email);
+    if (existingUser && existingUser.status === "active") {
+      return res.status(400).json({ error: "This user has already accepted and activated their account." });
+    }
+
+    console.log(`[TEAM] Resending invitation for: ${invitation.email}`);
+
+    const frontendBaseUrl = (
+      process.env.APP_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://herbariumgb.netlify.app"
+        : "http://localhost:3000")
+    ).trim().replace(/\/+$/, "");
+
+    const inviteUrl = `${frontendBaseUrl}/accept-invitation?token=${invitation.token}`;
+
+    try {
+      await sendAdminInvitationEmail({
+        name: invitation.name,
+        email: invitation.email,
+        role: invitation.role,
+        inviteUrl,
+        frontendUrl: frontendBaseUrl
+      });
+      db.updateInvitationEmailStatus(invitation.id, "sent");
+      return res.json({
+        success: true,
+        emailSent: true,
+        message: `Invitation email resent successfully to ${invitation.email}.`
+      });
+    } catch (mailErr) {
+      console.error("Resend invitation email delivery failed:", mailErr.message);
+      db.updateInvitationEmailStatus(invitation.id, "failed");
+      return res.status(502).json({
+        error: "Unable to deliver invitation email. Please verify mail service settings.",
+        emailSent: false
+      });
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

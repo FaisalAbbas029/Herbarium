@@ -24,45 +24,75 @@
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  .public-theme.dark,
-  .admin-theme.dark {
-    background-color: #17221B;
-    color: #E6EEE8;
+  /* Smooth Theme Switching Transitions */
+  .public-theme,
+  .admin-theme {
+    transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .admin-theme.dark[class*="bg-[#F7F5F0]"] {
+  .public-theme *,
+  .admin-theme * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html.dark,
+  body.dark,
+  html.dark body,
+  .public-theme.dark,
+  .admin-theme.dark,
+  .public-theme.dark[class*="bg-"],
+  .admin-theme.dark[class*="bg-"] {
     background-color: #17221B !important;
+    color: #E6EEE8 !important;
   }
 
   .public-theme.dark [class*="bg-[#FAF8F5]"],
   .public-theme.dark [class*="bg-white"],
+  .public-theme.dark [class*="bg-[#FFFFFF]"],
   .admin-theme.dark [class*="bg-[#FAF8F5]"],
-  .admin-theme.dark [class*="bg-white"] {
+  .admin-theme.dark [class*="bg-white"],
+  .admin-theme.dark [class*="bg-[#FFFFFF]"] {
     background-color: #202D24 !important;
   }
 
   .public-theme.dark [class*="bg-[#F3EFEA]"],
   .public-theme.dark [class*="bg-[#EAE5DE]"],
+  .public-theme.dark [class*="bg-[#ECE6DC]"],
+  .public-theme.dark [class*="bg-[#EDE7DD]"],
   .admin-theme.dark [class*="bg-[#F3EFEA]"],
-  .admin-theme.dark [class*="bg-[#EAE5DE]"] {
+  .admin-theme.dark [class*="bg-[#EAE5DE]"],
+  .admin-theme.dark [class*="bg-[#ECE6DC]"],
+  .admin-theme.dark [class*="bg-[#EDE7DD]"] {
     background-color: #29382E !important;
   }
 
   .public-theme.dark [class*="border-[#E0D9CE]"],
   .public-theme.dark [class*="border-[#EDE7DD]"],
   .public-theme.dark [class*="border-[#C7BEB1]"],
+  .public-theme.dark [class*="divide-[#EDE7DD]"] > *,
+  .public-theme.dark [class*="divide-[#E0D9CE]"] > *,
   .admin-theme.dark [class*="border-[#E0D9CE]"],
   .admin-theme.dark [class*="border-[#EDE7DD]"],
-  .admin-theme.dark [class*="border-[#C7BEB1]"] {
+  .admin-theme.dark [class*="border-[#C7BEB1]"],
+  .admin-theme.dark [class*="divide-[#EDE7DD]"] > *,
+  .admin-theme.dark [class*="divide-[#E0D9CE]"] > * {
     border-color: #405146 !important;
   }
 
   .public-theme.dark [class*="text-[#1C241E]"],
+  .public-theme.dark [class*="text-[#1E2922]"],
+  .admin-theme.dark [class*="text-[#1C241E]"],
+  .admin-theme.dark [class*="text-[#1E2922]"] {
+    color: #E6EEE8 !important;
+  }
+
   .public-theme.dark [class*="text-[#4A554D]"],
   .public-theme.dark [class*="text-[#566158]"],
   .public-theme.dark [class*="text-[#6E7570]"],
   .public-theme.dark [class*="text-[#7E8C81]"],
-  .admin-theme.dark [class*="text-[#1C241E]"],
   .admin-theme.dark [class*="text-[#4A554D]"],
   .admin-theme.dark [class*="text-[#566158]"],
   .admin-theme.dark [class*="text-[#6E7570]"],
@@ -70,9 +100,136 @@
     color: #D0DDD3 !important;
   }
 
+  /* Primary Botanical text in Dark Mode - crisp botanical contrast */
   .public-theme.dark [class*="text-[#1F4529]"],
-  .admin-theme.dark [class*="text-[#1F4529]"] {
-    color: #A8D0B3 !important;
+  .public-theme.dark [class*="text-[#2D5A3D]"],
+  .public-theme.dark [class*="text-[#47663B]"],
+  .public-theme.dark [class*="text-[#15321D]"],
+  .admin-theme.dark [class*="text-[#1F4529]"],
+  .admin-theme.dark [class*="text-[#2D5A3D]"],
+  .admin-theme.dark [class*="text-[#47663B]"],
+  .admin-theme.dark [class*="text-[#15321D]"] {
+    color: #72B989 !important;
+  }
+
+  /* Logo/Icon Palette Alignment for Icon Boxes & Badges in Dark Mode */
+  /* Replaces pale #EBF3ED / #A8D0B3 with the exact botanical logo combination: */
+  /* Logo background: #1F4529 / #2D5A3D | Logo icon: #E3D8C8 */
+  html.dark [class*="bg-[#EBF3ED]"],
+  body.dark [class*="bg-[#EBF3ED]"],
+  .public-theme.dark [class*="bg-[#EBF3ED]"],
+  .admin-theme.dark [class*="bg-[#EBF3ED]"] {
+    background-color: #1F4529 !important;
+    color: #E3D8C8 !important;
+    border-color: #2D5A3D !important;
+  }
+
+  html.dark [class*="bg-[#EBF3ED]"] svg,
+  body.dark [class*="bg-[#EBF3ED]"] svg,
+  .public-theme.dark [class*="bg-[#EBF3ED]"] svg,
+  .admin-theme.dark [class*="bg-[#EBF3ED]"] svg,
+  html.dark [class*="bg-[#EBF3ED]"] [class*="text-"],
+  body.dark [class*="bg-[#EBF3ED]"] [class*="text-"],
+  .public-theme.dark [class*="bg-[#EBF3ED]"] [class*="text-"],
+  .admin-theme.dark [class*="bg-[#EBF3ED]"] [class*="text-"] {
+    color: #E3D8C8 !important;
+  }
+
+  /* Full-width alert cards and message banners in Dark Mode */
+  html.dark div[class*="bg-[#EBF3ED]"][class*="border"],
+  body.dark div[class*="bg-[#EBF3ED]"][class*="border"],
+  .public-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"],
+  .admin-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] {
+    background-color: #182B1F !important;
+    border-color: #2D5A3D !important;
+    color: #D8E6DC !important;
+  }
+
+  html.dark div[class*="bg-[#EBF3ED]"][class*="border"] p,
+  body.dark div[class*="bg-[#EBF3ED]"][class*="border"] p,
+  .public-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] p,
+  .admin-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] p,
+  html.dark div[class*="bg-[#EBF3ED]"][class*="border"] span,
+  body.dark div[class*="bg-[#EBF3ED]"][class*="border"] span,
+  .public-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] span,
+  .admin-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] span {
+    color: #D8E6DC !important;
+  }
+
+  html.dark div[class*="bg-[#EBF3ED]"][class*="border"] svg,
+  body.dark div[class*="bg-[#EBF3ED]"][class*="border"] svg,
+  .public-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] svg,
+  .admin-theme.dark div[class*="bg-[#EBF3ED]"][class*="border"] svg {
+    color: #E3D8C8 !important;
+  }
+
+  /* Small status badges using bg-[#EBF3ED] in Dark Mode */
+  html.dark span[class*="bg-[#EBF3ED]"],
+  body.dark span[class*="bg-[#EBF3ED]"],
+  .public-theme.dark span[class*="bg-[#EBF3ED]"],
+  .admin-theme.dark span[class*="bg-[#EBF3ED]"] {
+    background-color: #1F4529 !important;
+    color: #E3D8C8 !important;
+    border: 1px solid #2D5A3D !important;
+  }
+
+  /* Hover states in Dark Mode */
+  .public-theme.dark [class*="hover:text-[#1F4529]"]:hover,
+  .public-theme.dark [class*="hover:text-[#15321D]"]:hover,
+  .admin-theme.dark [class*="hover:text-[#1F4529]"]:hover,
+  .admin-theme.dark [class*="hover:text-[#15321D]"]:hover {
+    color: #E3D8C8 !important;
+  }
+
+  html.dark [class*="hover:bg-[#EBF3ED]"]:hover,
+  body.dark [class*="hover:bg-[#EBF3ED]"]:hover,
+  .public-theme.dark [class*="hover:bg-[#EBF3ED]"]:hover,
+  .admin-theme.dark [class*="hover:bg-[#EBF3ED]"]:hover {
+    background-color: #2D5A3D !important;
+    color: #E3D8C8 !important;
+  }
+
+  .public-theme.dark [class*="hover:bg-[#F3EFEA]"]:hover,
+  .public-theme.dark [class*="hover:bg-[#EAE5DE]"]:hover,
+  .public-theme.dark [class*="hover:bg-[#FAF8F5]"]:hover,
+  .admin-theme.dark [class*="hover:bg-[#F3EFEA]"]:hover,
+  .admin-theme.dark [class*="hover:bg-[#EAE5DE]"]:hover,
+  .admin-theme.dark [class*="hover:bg-[#FAF8F5]"]:hover {
+    background-color: #2D3F33 !important;
+  }
+
+  /* Header & Navbar styling in Dark Mode */
+  .public-theme.dark header {
+    background-color: rgba(23, 34, 27, 0.96) !important;
+    border-bottom-color: #405146 !important;
+  }
+
+  .public-theme.dark header button,
+  .public-theme.dark header a {
+    color: #E6EEE8 !important;
+  }
+
+  .public-theme.dark header .theme-toggle-btn {
+    color: #E6EEE8 !important;
+  }
+
+  .public-theme.dark header button:hover {
+    color: #E3D8C8 !important;
+    background-color: #29382E !important;
+  }
+
+  /* Admin Header */
+  .admin-theme.dark header {
+    background-color: #202D24 !important;
+    border-bottom-color: #405146 !important;
+  }
+
+  .admin-theme.dark header button {
+    color: #E6EEE8 !important;
+  }
+
+  .admin-theme.dark header button:hover {
+    background-color: #29382E !important;
   }
 
   .public-theme.dark input,
@@ -86,9 +243,18 @@
     border-color: #526558 !important;
   }
 
+  .public-theme.dark input:focus,
+  .public-theme.dark textarea:focus,
+  .public-theme.dark select:focus,
+  .admin-theme.dark input:focus,
+  .admin-theme.dark textarea:focus,
+  .admin-theme.dark select:focus {
+    border-color: #6EAB84 !important;
+  }
+
   .public-theme.dark ::placeholder,
   .admin-theme.dark ::placeholder {
-    color: #91A497 !important;
+    color: #8DA193 !important;
   }
 
   .public-theme.dark .specimen-paper,
@@ -110,7 +276,7 @@
   }
 }
 
-/* Custom scrollbars for botanical aesthetic */
+/* Custom Botanical Scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -118,15 +284,32 @@
 
 ::-webkit-scrollbar-track {
   background: #F3EFEA;
+  transition: background-color 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #C7BEB1;
   border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #A89F91;
+}
+
+.public-theme.dark ::-webkit-scrollbar-track,
+.admin-theme.dark ::-webkit-scrollbar-track {
+  background: #17221B;
+}
+
+.public-theme.dark ::-webkit-scrollbar-thumb,
+.admin-theme.dark ::-webkit-scrollbar-thumb {
+  background: #36483C;
+}
+
+.public-theme.dark ::-webkit-scrollbar-thumb:hover,
+.admin-theme.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4A5F51;
 }
 
 /* Specimen Sheet Texture simulation */
@@ -150,40 +333,40 @@
   }
 }
 
-/* Animation Keyframes for Academic & Botanical Aesthetic */
+/* Animation Keyframes: Silky, fluid academic botanical animations */
 @keyframes pageEnter {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(8px) scale(0.998);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes herbFadeIn {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(12px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 @keyframes herbFadeInSimple {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 @keyframes navDrop {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-8px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
@@ -191,10 +374,10 @@
 
 @keyframes skeletonShimmer {
   0% {
-    background-position: -200% 0;
+    background-position: 200% 0;
   }
   100% {
-    background-position: 200% 0;
+    background-position: -200% 0;
   }
 }
 
@@ -215,13 +398,30 @@
   }
 }
 
+@keyframes modalOverlayFade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* Botanical Animation Utility Classes */
 .animate-page-enter {
-  animation: pageEnter 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: pageEnter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
 }
 
 .animate-fade-in {
-  animation: herbFadeInSimple 400ms ease-out forwards;
+  animation: herbFadeInSimple 350ms ease-out forwards;
 }
 
 .animate-heading-enter {
@@ -233,7 +433,7 @@
 }
 
 .animate-nav-drop {
-  animation: navDrop 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: navDrop 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .skeleton-shimmer {
@@ -242,8 +442,109 @@
   animation: skeletonShimmer 1.8s infinite ease-in-out;
 }
 
+.public-theme.dark .skeleton-shimmer,
+.admin-theme.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #202D24 25%, #2D3F33 50%, #202D24 75%) !important;
+  background-size: 200% 100% !important;
+}
+
 .botanical-pin-wrapper {
   animation: markerEntrancePulse 650ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-modal-backdrop {
+  animation: modalOverlayFade 200ms ease-out both;
+}
+
+.animate-modal-dialog {
+  animation: modalPopIn 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Theme Toggle Button Micro-Interactions */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.2s ease,
+              color 0.2s ease !important;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.92);
+}
+
+.theme-toggle-icon {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center center;
+}
+
+.theme-toggle-btn:hover .theme-toggle-icon {
+  transform: rotate(20deg) scale(1.08);
+}
+
+/* Visual guidance: Pulses a clear attention-directing highlight onto fields requiring correction */
+@keyframes errorFieldPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(143, 45, 20, 0);
+    border-color: #8F2D14;
+  }
+  20% {
+    box-shadow: 0 0 0 4px rgba(143, 45, 20, 0.45);
+    background-color: #FFF5F5;
+    border-color: #8F2D14;
+  }
+  45% {
+    box-shadow: 0 0 0 2px rgba(143, 45, 20, 0.25);
+    border-color: #8F2D14;
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(143, 45, 20, 0.35);
+    background-color: #FFF5F5;
+    border-color: #8F2D14;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(143, 45, 20, 0);
+  }
+}
+
+@keyframes errorFieldPulseDark {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 131, 115, 0);
+    border-color: #E58373;
+  }
+  20% {
+    box-shadow: 0 0 0 4px rgba(229, 131, 115, 0.5);
+    background-color: #381B18;
+    border-color: #E58373;
+  }
+  45% {
+    box-shadow: 0 0 0 2px rgba(229, 131, 115, 0.3);
+    border-color: #E58373;
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(229, 131, 115, 0.4);
+    background-color: #381B18;
+    border-color: #E58373;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 131, 115, 0);
+  }
+}
+
+.error-field-highlight {
+  animation: errorFieldPulse 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+  border-color: #8F2D14 !important;
+}
+
+.public-theme.dark .error-field-highlight,
+.admin-theme.dark .error-field-highlight {
+  animation: errorFieldPulseDark 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+  border-color: #E58373 !important;
 }
 
 /* Accessibility: Respect Reduced Motion Preference */

@@ -8,7 +8,9 @@ import {
   faCheck,
   faClock,
   faCircleExclamation,
-  faCircleCheck
+  faCircleCheck,
+  faRotate,
+  faEnvelope
 } from "@fortawesome/free-solid-svg-icons";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -27,7 +29,10 @@ const AdminTeamPage = ({ onNavigate }) => {
   const [generatedInviteLink, setGeneratedInviteLink] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [nameError, setNameError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
   const [pageError, setPageError] = useState(null);
+  const [resendingInviteId, setResendingInviteId] = useState(null);
   const [userToToggle, setUserToToggle] = useState(null);
   const [isTogglingUser, setIsTogglingUser] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -56,23 +61,73 @@ const AdminTeamPage = ({ onNavigate }) => {
 
   const handleSendInvite = async (e) => {
     e.preventDefault();
-    if (!inviteEmail.trim() || !inviteName.trim()) return;
+    const trimmedName = inviteName.trim();
+    const trimmedEmail = inviteEmail.trim().toLowerCase();
+    setNameError(null);
+    setEmailError(null);
     setErrorMsg(null);
     setSuccessMsg(null);
+
+    let hasValidationError = false;
+    if (!trimmedName) {
+      setNameError("Name is required.");
+      hasValidationError = true;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+      setEmailError("Please enter a valid email address.");
+      hasValidationError = true;
+    }
+    const existingDuplicate = users.find((u) => u.email.toLowerCase() === trimmedEmail);
+    if (existingDuplicate) {
+      setEmailError("This email is already registered.");
+      hasValidationError = true;
+    }
+    if (hasValidationError) return;
+
     setIsSubmittingInvite(true);
     try {
       const res = await api.inviteColleague({
-        email: inviteEmail.trim(),
-        name: inviteName.trim(),
+        email: trimmedEmail,
+        name: trimmedName,
         role: inviteRole
       });
-      const inviteUrl = `${window.location.origin}/accept-invitation?token=${res.invitation.token}`;
+      const inviteUrl = res.inviteLink || `${window.location.origin}/accept-invitation?token=${res.invitation.token}`;
       setGeneratedInviteLink(inviteUrl);
+      if (res.emailSent) {
+        setSuccessMsg("Invitation email sent successfully.");
+      } else {
+        setPageError("Admin invitation created, but the invitation email could not be sent.");
+      }
       fetchTeam(false);
     } catch (err) {
-      setErrorMsg(err.message || "Failed to send invitation.");
+      if (err.status === 409 || err.message?.includes("already registered") || err.message?.includes("already exists")) {
+        setEmailError("This email is already registered.");
+      } else if (err.message?.includes("valid email")) {
+        setEmailError("Please enter a valid email address.");
+      } else {
+        setErrorMsg(err.message || "Unable to create Admin. Please try again.");
+      }
     } finally {
       setIsSubmittingInvite(false);
+    }
+  };
+
+  const handleResendInvite = async (inv) => {
+    if (!inv || resendingInviteId) return;
+    setResendingInviteId(inv.id);
+    setPageError(null);
+    setSuccessMsg(null);
+    try {
+      const res = await api.resendInvitation(inv.id);
+      setSuccessMsg(res.message || `Invitation email resent successfully to ${inv.email}.`);
+      fetchTeam(false);
+    } catch (err) {
+      console.error("Failed to resend invitation:", err);
+      setPageError(err.message || "Failed to resend invitation email.");
+      fetchTeam(false);
+    } finally {
+      setResendingInviteId(null);
     }
   };
 
@@ -180,13 +235,13 @@ const AdminTeamPage = ({ onNavigate }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="text-xs uppercase font-bold tracking-widest text-[#47663B]">
-            Governance & Staff
+            Admin Management
           </div>
           <h1 className="font-serif-heading text-2xl sm:text-3xl font-bold text-[#1C241E]">
-            Curatorial Team & Roles
+            Admin Management
           </h1>
           <p className="text-xs text-[#566158]">
-            Manage herbarium curators, taxonomists, and superadministrator credentials.
+            Manage administrators who can access GB Herbarium.
           </p>
         </div>
 
@@ -195,13 +250,16 @@ const AdminTeamPage = ({ onNavigate }) => {
             setGeneratedInviteLink(null);
             setInviteEmail("");
             setInviteName("");
+            setInviteRole("curator");
+            setNameError(null);
+            setEmailError(null);
             setErrorMsg(null);
             setShowInviteModal(true);
           }}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors shadow-xs self-start sm:self-auto"
         >
           <FontAwesomeIcon icon={faUserPlus} className="w-3.5 h-3.5" />
-          <span>Invite New Curator</span>
+          <span>+ Add Admin</span>
         </button>
       </div>
 
@@ -231,7 +289,7 @@ const AdminTeamPage = ({ onNavigate }) => {
         <div className="p-4 border-b border-[#EDE7DD] bg-[#FAF8F5] flex items-center justify-between">
           <h2 className="font-serif-heading text-sm font-bold text-[#1C241E] flex items-center gap-2">
             <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5 text-[#2D5A3D]" />
-            <span>Active Archival Curators ({users.length})</span>
+            <span>Active Administrators ({users.length})</span>
           </h2>
         </div>
 
@@ -239,9 +297,9 @@ const AdminTeamPage = ({ onNavigate }) => {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-[#E0D9CE] text-[#566158] uppercase font-semibold text-[11px] tracking-wider">
-                <th className="py-3 px-4">Name & Title</th>
-                <th className="py-3 px-4">Institutional Email</th>
-                <th className="py-3 px-4">System Role</th>
+                <th className="py-3 px-4">Name</th>
+                <th className="py-3 px-4">Email</th>
+                <th className="py-3 px-4">Role</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
@@ -277,7 +335,7 @@ const AdminTeamPage = ({ onNavigate }) => {
                               : "bg-[#EDE7DD] text-[#3D443F]"
                           }`}
                         >
-                          {u.role}
+                          {u.role === "superadmin" ? "SUPER ADMIN" : "ADMIN"}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -327,13 +385,13 @@ const AdminTeamPage = ({ onNavigate }) => {
         <div className="p-4 border-b border-[#EDE7DD] bg-[#FAF8F5] flex items-center justify-between">
           <h2 className="font-serif-heading text-sm font-bold text-[#1C241E] flex items-center gap-2">
             <FontAwesomeIcon icon={faClock} className="w-3.5 h-3.5 text-[#A45D25]" />
-            <span>Pending Staff Invitations ({invitations.length})</span>
+            <span>Pending Administrator Invitations ({invitations.length})</span>
           </h2>
         </div>
 
         {invitations.length === 0 ? (
           <div className="p-6 text-center text-xs text-[#6E7570]">
-            No outstanding invitations. All curators are onboarded.
+            No outstanding invitations. All administrators are onboarded.
           </div>
         ) : (
           <div className="divide-y divide-[#EDE7DD]">
@@ -347,19 +405,51 @@ const AdminTeamPage = ({ onNavigate }) => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#1C241E]">
-                        {inv.name || "Invited Curator"}
+                        {inv.name || "Invited Admin"}
                       </span>
-                      <span className="px-1.5 py-0.2 bg-[#EDE7DD] text-[#566158] text-[9px] font-bold uppercase rounded-xs">
-                        {inv.role}
+                      <span
+                        className={`px-1.5 py-0.2 text-[9px] font-bold uppercase rounded-xs ${
+                          inv.role === "superadmin"
+                            ? "bg-[#1F4529] text-white"
+                            : "bg-[#EDE7DD] text-[#566158]"
+                        }`}
+                      >
+                        {inv.role === "superadmin" ? "SUPER ADMIN" : "ADMIN"}
                       </span>
+                      {inv.emailDeliveryStatus === "failed" ? (
+                        <span className="px-1.5 py-0.2 bg-[#FDF2F2] text-[#8F2D14] text-[9px] font-bold uppercase rounded-xs">
+                          Email Failed
+                        </span>
+                      ) : inv.emailDeliveryStatus === "sent" ? (
+                        <span className="px-1.5 py-0.2 bg-[#EBF3ED] text-[#1F4529] text-[9px] font-bold uppercase rounded-xs">
+                          Delivered
+                        </span>
+                      ) : (
+                        <span className="px-1.5 py-0.2 bg-[#FAF8F5] border border-[#EDE7DD] text-[#566158] text-[9px] font-bold uppercase rounded-xs">
+                          Invited
+                        </span>
+                      )}
                     </div>
                     <div className="text-[11px] font-mono-acc text-[#6E7570]">{inv.email}</div>
                     <div className="text-[10px] text-[#8E9990]">
-                      Invited on {new Date(inv.createdAt).toLocaleDateString()} • Status: {inv.status}
+                      Invited on {new Date(inv.createdAt).toLocaleDateString()} • Status: {inv.status === "pending" ? "Invited" : inv.status}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => handleResendInvite(inv)}
+                      disabled={resendingInviteId === inv.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#1F4529] bg-[#FAF8F5] hover:bg-[#EBF3ED] text-[#1F4529] rounded-sm text-[11px] font-semibold transition-colors disabled:opacity-50"
+                      title="Resend invitation email"
+                    >
+                      <FontAwesomeIcon
+                        icon={faRotate}
+                        className={`w-3 h-3 ${resendingInviteId === inv.id ? "animate-spin" : ""}`}
+                      />
+                      <span>{resendingInviteId === inv.id ? "Resending..." : "Resend"}</span>
+                    </button>
+
                     <button
                       onClick={() => copyToClipboard(inviteLink)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#C7BEB1] rounded-sm text-[11px] font-semibold text-[#1C241E] hover:bg-white transition-colors"
@@ -392,14 +482,14 @@ const AdminTeamPage = ({ onNavigate }) => {
         )}
       </div>
 
-      {/* Invite Modal */}
+      {/* Add Admin Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white border border-[#E0D9CE] rounded-sm shadow-xl max-w-md w-full p-6 space-y-6 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#EDE7DD] pb-3">
               <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] flex items-center gap-2">
                 <FontAwesomeIcon icon={faUserPlus} className="w-4 h-4 text-[#1F4529]" />
-                <span>Invite Archival Curator</span>
+                <span>Add Admin</span>
               </h3>
               <button
                 onClick={() => setShowInviteModal(false)}
@@ -424,7 +514,7 @@ const AdminTeamPage = ({ onNavigate }) => {
                     <span>Invitation Created</span>
                   </div>
                   <p className="text-[11px] text-[#2D5A3D]">
-                    Share this unique onboarding link with the curator. The link expires in 7 days.
+                    Share this unique onboarding link with the admin. The link expires in 7 days.
                   </p>
                   <div className="p-2 bg-white border border-[#C5DDCB] rounded-xs font-mono-acc text-[10px] break-all text-[#1C241E]">
                     {generatedInviteLink}
@@ -455,44 +545,102 @@ const AdminTeamPage = ({ onNavigate }) => {
               <form onSubmit={handleSendInvite} className="space-y-4 text-xs">
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
-                    Curator Full Name <span className="text-[#8F2D14]">*</span>
+                    Full Name <span className="text-[#8F2D14]">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={inviteName}
-                    onChange={(e) => setInviteName(e.target.value)}
+                    onChange={(e) => {
+                      setInviteName(e.target.value);
+                      if (nameError) setNameError(null);
+                    }}
                     placeholder="e.g. Dr. Arthur Cronquist"
-                    className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:ring-1 focus:ring-[#1F4529]"
+                    className={`w-full px-3 py-2 text-xs bg-[#FAF8F5] border rounded-sm focus:ring-1 focus:ring-[#1F4529] ${
+                      nameError ? "border-[#8F2D14]" : "border-[#C7BEB1]"
+                    }`}
                   />
+                  {nameError && (
+                    <p className="text-[11px] text-[#8F2D14]">{nameError}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
-                    Institutional Email Address <span className="text-[#8F2D14]">*</span>
+                    Email <span className="text-[#8F2D14]">*</span>
                   </label>
                   <input
                     type="email"
                     required
                     value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
+                    onChange={(e) => {
+                      setInviteEmail(e.target.value);
+                      if (emailError) setEmailError(null);
+                    }}
                     placeholder="admin@gb-herbarium.org"
-                    className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:ring-1 focus:ring-[#1F4529]"
+                    className={`w-full px-3 py-2 text-xs bg-[#FAF8F5] border rounded-sm focus:ring-1 focus:ring-[#1F4529] ${
+                      emailError ? "border-[#8F2D14]" : "border-[#C7BEB1]"
+                    }`}
                   />
+                  {emailError && (
+                    <p className="text-[11px] text-[#8F2D14]">{emailError}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[#566158]">
-                    Permission Tier
+                    Administrative Role <span className="text-[#8F2D14]">*</span>
                   </label>
-                  <select
-                    value={inviteRole}
-                    onChange={(e) => setInviteRole(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#C7BEB1] rounded-sm focus:ring-1 focus:ring-[#1F4529]"
-                  >
-                    <option value="curator">Curator / Taxonomist (Record Management)</option>
-                    <option value="superadmin">Superadministrator (Full Governance & Logs)</option>
-                  </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label
+                      className={`flex flex-col p-3 border rounded-sm cursor-pointer transition-all ${
+                        inviteRole === "curator"
+                          ? "border-[#1F4529] bg-[#FAFBF9] ring-1 ring-[#1F4529]"
+                          : "border-[#C7BEB1] bg-white hover:border-[#8E9990]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-[#1C241E] text-xs">Admin</span>
+                        <input
+                          type="radio"
+                          name="inviteRole"
+                          value="curator"
+                          checked={inviteRole === "curator"}
+                          onChange={() => setInviteRole("curator")}
+                          className="text-[#1F4529] focus:ring-[#1F4529]"
+                        />
+                      </div>
+                      <span className="text-[11px] text-[#566158] leading-snug">
+                        Can manage, edit, catalog, and publish botanical specimens.
+                      </span>
+                    </label>
+
+                    <label
+                      className={`flex flex-col p-3 border rounded-sm cursor-pointer transition-all ${
+                        inviteRole === "superadmin"
+                          ? "border-[#1F4529] bg-[#FAFBF9] ring-1 ring-[#1F4529]"
+                          : "border-[#C7BEB1] bg-white hover:border-[#8E9990]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-[#1C241E] text-xs flex items-center gap-1.5">
+                          <FontAwesomeIcon icon={faShieldHalved} className="w-3 h-3 text-[#1F4529]" />
+                          <span>Super Admin</span>
+                        </span>
+                        <input
+                          type="radio"
+                          name="inviteRole"
+                          value="superadmin"
+                          checked={inviteRole === "superadmin"}
+                          onChange={() => setInviteRole("superadmin")}
+                          className="text-[#1F4529] focus:ring-[#1F4529]"
+                        />
+                      </div>
+                      <span className="text-[11px] text-[#566158] leading-snug">
+                        Full control: can invite and manage administrators and view audit logs.
+                      </span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EDE7DD]">
@@ -508,7 +656,7 @@ const AdminTeamPage = ({ onNavigate }) => {
                     disabled={isSubmittingInvite}
                     className="px-5 py-2 bg-[#1F4529] hover:bg-[#15321D] text-white text-xs font-semibold uppercase tracking-wider rounded-sm transition-colors"
                   >
-                    {isSubmittingInvite ? "Generating..." : "Create Invitation Link"}
+                    {isSubmittingInvite ? "Creating Admin..." : "Add Admin"}
                   </button>
                 </div>
               </form>

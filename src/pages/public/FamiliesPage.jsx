@@ -72,7 +72,7 @@ const FamiliesPage = ({ onNavigate }) => {
               >
                 <div className="flex items-center justify-between w-full">
                   <div className="w-8 h-8 rounded-xs bg-[#EBF3ED] text-[#1F4529] group-hover:bg-[#1F4529] group-hover:text-[#FAF8F5] flex items-center justify-center transition-colors duration-200">
-                    <FontAwesomeIcon icon={faPagelines} className="w-3.5 h-3.5 group-hover:!text-[#FAF8F5] transition-colors duration-200" style={{ color: "rgb(30, 48, 80)" }} />
+                    <FontAwesomeIcon icon={faPagelines} className="w-3.5 h-3.5 group-hover:!text-[#FAF8F5] transition-colors duration-200" />
                   </div>
                   <span className="font-mono-acc text-xs bg-[#FAF8F5] px-2 py-0.5 border border-[#EDE7DD] rounded-xs text-[#566158]">
                     {item.count} {item.count === 1 ? "specimen" : "specimens"}

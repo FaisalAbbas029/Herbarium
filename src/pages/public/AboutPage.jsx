@@ -2,6 +2,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookOpen, faClipboardCheck } from "@fortawesome/free-solid-svg-icons";
 import { ScrollReveal } from "../../components/common/ScrollReveal.jsx";
 
+import saqibAliImg from "../../assets/Saqib Ali.jpeg";
+import faisalAbbasImg from "../../assets/Faisal Abbas.jpg";
+import heeraFatimaImg from "../../assets/Heera Fatima.jpg";
+import reefaZehraImg from "../../assets/Reefa Zehra.jpg";
+import samreenZehraImg from "../../assets/Samreen Zehra.jpeg";
+import tasleemZehraImg from "../../assets/Tasleem Zehra.jpeg";
+import tehsenaBatoolImg from "../../assets/Tehsena Batool.jpeg";
+import zehraSherImg from "../../assets/Zehra Sher.jpeg";
+
 const AboutPage = ({ onNavigate }) => {
   return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       {/* Intro Header */}
@@ -89,50 +98,50 @@ const AboutPage = ({ onNavigate }) => {
             </div>
           </ScrollReveal>
 
-          {/* Dr. Aarav Patel */}
+          {/* Saqib Ali */}
           <ScrollReveal delay={80}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
-                  alt="Dr. Aarav Patel"
+                  src={saqibAliImg}
+                  alt="Saqib Ali"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Dr. Aarav Patel
+                  Saqib Ali
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
-                  Field Taxonomist &amp; Pharmacognosist
+                  Curatorial Supervisor &amp; Field Botanist
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                Ph.D. in Pharmacognosy &amp; Ethnobotany. Leads field expeditions across the Alps, Carpathians, and Mediterranean basin investigating secondary metabolite biosynthesis.
+                Supervises curatorial operations, field taxonomy expeditions, and the systematic collection of flora across Gilgit-Baltistan and surrounding alpine regions.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Sarah Lindqvist */}
+          {/* Faisal Abbas */}
           <ScrollReveal delay={160}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80"
-                  alt="Sarah Lindqvist"
+                  src={faisalAbbasImg}
+                  alt="Faisal Abbas"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Sarah Lindqvist
+                  Faisal Abbas
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
-                  Head of Physical Collections &amp; Digitization
+                  Lead Curator &amp; Archive Administrator
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                M.Sc. in Museum Conservation. Oversees environmental vault control (18°C, 45% RH), cryogenic pest quarantine, and gigapixel voucher imaging pipelines.
+                Oversees archival administration, systematic botanical classification, digitisation infrastructure, and institutional research collaborations.
               </p>
             </div>
           </ScrollReveal>
@@ -156,146 +165,146 @@ const AboutPage = ({ onNavigate }) => {
         </ScrollReveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Dr. Maya Rahman */}
+          {/* Heera Fatima */}
           <ScrollReveal delay={0}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=300&q=80"
-                  alt="Dr. Maya Rahman"
+                  src={heeraFatimaImg}
+                  alt="Heera Fatima"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Dr. Maya Rahman
+                  Heera Fatima
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
                   Plant Systematist &amp; Biodiversity Researcher
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                Ph.D. in Plant Systematics. Specializes in alpine plant diversity, vascular plant taxonomy, and biodiversity assessment across high-elevation ecosystems.
+                Specializes in alpine vascular plant taxonomy, phytogeographic mapping, and biodiversity assessment across northern high-elevation ecosystems.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Dr. Daniel Morgan */}
+          {/* Reefa Zehra */}
           <ScrollReveal delay={60}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"
-                  alt="Dr. Daniel Morgan"
+                  src={reefaZehraImg}
+                  alt="Reefa Zehra"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Dr. Daniel Morgan
+                  Reefa Zehra
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
-                  Herbarium Data Scientist &amp; Digital Collections Lead
+                  Herbarium Collections Specialist &amp; Taxonomist
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                Ph.D. in Biodiversity Informatics. Develops specimen databases, digital collection standards, data quality workflows, and biodiversity data integration systems.
+                Focuses on systematic voucher preparation, morphological characterization, and diagnostic taxonomy for regional botanical archives.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Dr. Laila Hussain */}
+          {/* Samreen Zehra */}
           <ScrollReveal delay={120}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=300&q=80"
-                  alt="Dr. Laila Hussain"
+                  src={samreenZehraImg}
+                  alt="Samreen Zehra"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Dr. Laila Hussain
+                  Samreen Zehra
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
                   Ethnobotanist &amp; Medicinal Plant Researcher
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                Ph.D. in Ethnobotany. Researches traditional plant knowledge, medicinal flora, and the relationship between local communities and botanical resources.
+                Researches ethnobotanical folk traditions, medicinal plant properties, and conservation strategies for vulnerable mountain species.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Dr. Thomas Weber */}
+          {/* Tasleem Zehra */}
           <ScrollReveal delay={180}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80"
-                  alt="Dr. Thomas Weber"
+                  src={tasleemZehraImg}
+                  alt="Tasleem Zehra"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Dr. Thomas Weber
+                  Tasleem Zehra
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
-                  Bryologist &amp; Alpine Flora Specialist
+                  Cryptogamic Botanist &amp; Alpine Flora Specialist
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                Ph.D. in Botany. Specializes in mosses, liverworts, alpine ecosystems, and the documentation of cryptogamic diversity in mountainous regions.
+                Specializes in mosses, liverworts, lichens, and cryptogamic flora across alpine screes and glacial valley habitats.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Amina Khan */}
+          {/* Tehsena Batool */}
           <ScrollReveal delay={240}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80"
-                  alt="Amina Khan"
+                  src={tehsenaBatoolImg}
+                  alt="Tehsena Batool"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Amina Khan
+                  Tehsena Batool
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
-                  Herbarium Collections Manager &amp; Conservation Specialist
+                  Herbarium Collections Manager &amp; Conservationist
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                M.Sc. in Conservation Biology. Oversees specimen preservation, collection management, archival standards, pest monitoring, and long-term herbarium storage.
+                Oversees archival mounting standards, specimen preservation, cryogenic pest control, and long-term herbarium repository integrity.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Dr. Yusuf Karim */}
+          {/* Zehra Sher */}
           <ScrollReveal delay={300}>
             <div className="group bg-white border border-[#E0D9CE] rounded-sm p-6 space-y-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md hover:border-[#2D5A3D] h-full">
               <div className="w-20 h-20 rounded-full overflow-hidden border border-[#E0D9CE] transition-colors duration-300 group-hover:border-[#47663B]">
                 <img
-                  src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80"
-                  alt="Dr. Yusuf Karim"
+                  src={zehraSherImg}
+                  alt="Zehra Sher"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                 />
               </div>
               <div>
                 <h3 className="font-serif-heading text-lg font-bold text-[#1C241E] group-hover:text-[#1F4529] transition-colors">
-                  Dr. Yusuf Karim
+                  Zehra Sher
                 </h3>
                 <p className="text-xs uppercase font-semibold text-[#47663B]">
-                  Molecular Botanist &amp; Plant Genomics Researcher
+                  Digital Archivist &amp; Botanical Data Specialist
                 </p>
               </div>
               <p className="text-xs text-[#566158] leading-relaxed">
-                Ph.D. in Plant Molecular Biology. Uses DNA barcoding, molecular systematics, and plant genomics to support accurate identification and evolutionary research.
+                Directs high-resolution gigapixel voucher digitization, biodiversity informatics database management, and open-access data pipelines.
               </p>
             </div>
           </ScrollReveal>

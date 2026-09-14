@@ -67,7 +67,7 @@ const AdminDashboardPage = ({ onNavigate }) => {
         </h1>
         <p className="text-xs text-[#566158]">
           Gilgit-Baltistan Herbarium Archive Admin Panel • Role:{" "}
-          <strong className="text-[#1F4529] uppercase">{user?.role === "curator" ? "Admin" : user?.role || "Admin"}</strong>
+          <strong className="text-[#1F4529] uppercase">{user?.role === "superadmin" ? "Super Admin" : "Admin"}</strong>
         </p>
       </div>
 

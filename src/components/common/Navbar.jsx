@@ -7,10 +7,12 @@ import {
   faUserTie,
   faArrowRightFromBracket,
   faBars,
-  faXmark
+  faXmark,
+  faMoon,
+  faSun
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../../context/AuthContext.jsx";
-const Navbar = ({ currentPath, onNavigate }) => {
+const Navbar = ({ currentPath, onNavigate, isDarkMode, onToggleTheme }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navLinks = [
@@ -69,6 +71,14 @@ const Navbar = ({ currentPath, onNavigate }) => {
         {/* Zone 3: Primary Actions (1-2 actions) */}
         <div className="hidden md:flex items-center gap-2.5">
           <button
+            onClick={onToggleTheme}
+            className="theme-toggle-btn p-2 text-[#4A554D] hover:text-[#1F4529] hover:bg-[#F3EFEA] rounded-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#1F4529]"
+            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className="w-5 h-5 theme-toggle-icon" />
+          </button>
+          <button
             onClick={() => handleNav("/search")}
             className="p-2 text-[#4A554D] hover:text-[#1F4529] hover:bg-[#F3EFEA] rounded-sm transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#1F4529]"
             title="Search Archive"
@@ -102,6 +112,14 @@ const Navbar = ({ currentPath, onNavigate }) => {
 
         {/* Mobile menu toggle */}
         <div className="flex md:hidden items-center gap-2">
+          <button
+            onClick={onToggleTheme}
+            className="theme-toggle-btn p-2 text-[#4A554D] hover:bg-[#F3EFEA] rounded-sm"
+            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className="w-5 h-5 theme-toggle-icon" />
+          </button>
           <button
             onClick={() => handleNav("/search")}
             className="p-2 text-[#4A554D] hover:bg-[#F3EFEA] rounded-sm transition-colors"

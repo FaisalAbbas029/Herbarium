@@ -158,6 +158,11 @@ const api = {
       method: "DELETE"
     });
   },
+  async resendInvitation(invitationId) {
+    return request(`/team/invitations/${invitationId}/resend`, {
+      method: "POST"
+    });
+  },
   async getInvitationByToken(token) {
     return request(`/team/invitation/${token}`);
   },

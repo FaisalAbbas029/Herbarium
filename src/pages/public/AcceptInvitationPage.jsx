@@ -73,7 +73,7 @@ const AcceptInvitationPage = ({
             <FontAwesomeIcon icon={faUserShield} className="w-6 h-6" />
           </div>
           <h1 className="font-serif-heading text-2xl font-bold text-[#1C241E]">
-            Accept Curator Invitation
+            Accept {invitation?.role === "superadmin" ? "Super Admin" : "Admin"} Invitation
           </h1>
           <p className="text-xs text-[#566158]">
             Set up your credentials to join the Gilgit-Baltistan Herbarium Archive team.
@@ -88,7 +88,7 @@ const AcceptInvitationPage = ({
         {success ? <div className="p-4 bg-[#EBF3ED] border border-[#C5DDCB] text-[#1F4529] text-xs rounded-sm space-y-2 text-center">
             <FontAwesomeIcon icon={faCircleCheck} className="w-6 h-6 mx-auto text-[#2D5A3D]" />
             <p className="font-bold">Account Activated Successfully!</p>
-            <p className="text-[#566158]">Redirecting to Curator Portal...</p>
+            <p className="text-[#566158]">Redirecting to Admin Portal...</p>
           </div> : invitation ? <form onSubmit={handleSubmit} className="space-y-4">
             <div className="p-3 bg-[#FAF8F5] border border-[#EDE7DD] rounded-sm text-xs space-y-1.5">
               <div className="flex justify-between">
@@ -99,9 +99,17 @@ const AcceptInvitationPage = ({
                 <span className="text-[#6E7570]">Email:</span>
                 <strong className="text-[#1C241E] font-mono-acc">{invitation.email}</strong>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-[#6E7570]">Assigned Role:</span>
-                <strong className="text-[#1F4529] uppercase">{invitation.role}</strong>
+                <span
+                  className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-xs ${
+                    invitation.role === "superadmin"
+                      ? "bg-[#1F4529] text-white"
+                      : "bg-[#EDE7DD] text-[#3D443F]"
+                  }`}
+                >
+                  {invitation.role === "superadmin" ? "Super Admin" : "Admin"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#6E7570]">Invited By:</span>

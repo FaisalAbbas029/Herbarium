@@ -12,9 +12,9 @@ const ConfirmModal = ({
   onCancel
 }) => {
   if (!isOpen) return null;
-  return <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+  return <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-modal-backdrop">
       <div
-    className="bg-white border border-[#E0D9CE] rounded-sm max-w-md w-full p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-150"
+    className="bg-white border border-[#E0D9CE] rounded-sm max-w-md w-full p-6 shadow-xl relative animate-modal-dialog"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
